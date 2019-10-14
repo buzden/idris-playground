@@ -19,8 +19,8 @@ m = run $ f 3
 l : List Int
 l = run $ f 3
 
-el : List (Either Error Int)
-el = run $ f 3
+-- el : List (Either Error Int)
+-- el = run $ f 3
 
-le : Either Error (List Int)
-le = run $ f 3
+-- le : Either Error (List Int)
+-- le = run $ f 3
