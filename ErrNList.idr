@@ -1,26 +1,26 @@
 module ErrNList
 
-import Effect.Exception
 import Effect.Select
+import Effect.StdIO
 import Effects
 
-data Error = NumberIs2
-
-f : Int -> Eff Int [SELECT, EXCEPTION Error]
+f : Int -> Eff Int [SELECT, STDIO]
 f n = do
     x <- select [n .. 10]
     if x == 2
-        then raise NumberIs2
+        then do
+          putStrLn "The number is 2, incrementing"
+          pure $ x + 1
         else pure x
 
-m : Maybe Int
-m = run $ f 3
+-- m : Maybe Int
+-- m = run $ f 3
 
-l : List Int
-l = run $ f 3
+-- l : List Int
+-- l = run $ f 3
 
--- el : List (Either Error Int)
+-- el : List (IO Int)
 -- el = run $ f 3
 
--- le : Either Error (List Int)
+-- le : IO (List Int)
 -- le = run $ f 3
