@@ -19,8 +19,14 @@ f n = do
 -- l : List Int
 -- l = run $ f 3
 
--- el : List (IO Int)
--- el = run $ f 3
+el : List (IO Int)
+el = run . run $ f 3
 
--- le : IO (List Int)
--- le = run $ f 3
+el' : List (IO Int)
+el' = run $ f 3
+
+le : IO (List Int)
+le = run . run $ f 3
+
+le' : IO (List Int)
+le' = run $ f 3
