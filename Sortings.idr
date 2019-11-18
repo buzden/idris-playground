@@ -5,11 +5,6 @@ import Data.Vect
 
 %default total
 
-weaken1 : (fn : Fin n) -> (fsn : Fin (S n) ** finToNat fn = finToNat fsn)
-weaken1 FZ = (FZ ** Refl)
-weaken1 (FS n) with (weaken1 n)
-  | (nw ** nat_n_eq_nat_nw) = (FS nw ** eqSucc (finToNat n) (finToNat nw) nat_n_eq_nat_nw)
-
 count : Eq a => a -> Vect n a -> Fin (S n)
 count _ Nil = 0
 count x (y :: xs) = (if x == y then FS else weaken) $ count x xs
