@@ -15,7 +15,7 @@ data ElemCount : Fin (S n) -> a -> Vect n a -> Type where
   IncThere : Eq a => {x, y : a} -> ElemCount c x xs -> x == y = False -> ElemCount (weaken c) x (y :: xs)
 
   -- Variant with structural equality instead of `Eq`:
-  --IncThere : ElemCount c x xs -> x = y -> Void -> ElemCount (weaken c) x (y :: xs)
+  --IncThere : ElemCount c x xs -> Not (x = y) -> ElemCount (weaken c) x (y :: xs)
 
 Permutation : Vect n a -> Vect n a -> Type
 Permutation xs ys = ?perm
