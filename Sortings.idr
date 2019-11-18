@@ -17,8 +17,12 @@ data ElemCount : Fin (S n) -> a -> Vect n a -> Type where
   -- Variant with structural equality instead of `Eq`:
   --IncThere : ElemCount c x xs -> Not (x = y) -> ElemCount (weaken c) x (y :: xs)
 
-Permutation : Vect n a -> Vect n a -> Type
-Permutation xs ys = ?perm
+-- TODO To define permutation through `ElemCount` (probably, the structural one)
+-- TODO   and proove equivalence with the structurally defined permutation property.
+
+||| Structural inductive rules for prooving that one vector is a permutation of another.
+data Permutation : Vect n a -> Vect n a -> Type where
+  Empty : Permutation [] []
 
 (<=) : Ord a => a -> a -> Type
 x <= y = (x <= y) = True
@@ -31,7 +35,3 @@ data Sorted : Vect n a -> Type where
 ||| Sorting with direct encoding of first-order logic formulae of sortedness properties
 sortDirect : (v : Vect n a) -> (s : Vect n a ** (v `Permutation` s, Sorted s))
 sortDirect = ?sortDirect
-
---||| An attempt to formulate properties of sortedness using structural things (like `Fin n`)
---sortStructural : Type
---sortStructural = ?sortStructural
