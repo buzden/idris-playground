@@ -20,15 +20,13 @@ data ElemCount : Fin (S n) -> a -> Vect n a -> Type where
 Permutation : Vect n a -> Vect n a -> Type
 Permutation xs ys = ?perm
 
-LTE : Ord a => a -> a -> Type
-LTE x y = (x <= y) = True
--- #. Can we name `LTE` as `(<=)`?
--- #. Why if we do so, `sortDirect` stops to typecheck?
+(<=) : Ord a => a -> a -> Type
+x <= y = (x <= y) = True
 
 data Sorted : Vect n a -> Type where
-  Empty     :                                       Sorted []
-  Singleton :                                       Sorted [a]
-  Comp      : Ord a => Sorted (x::xs) -> LTE y x -> Sorted (y::x::xs)
+  Empty     :                                                    Sorted []
+  Singleton :                                                    Sorted [x]
+  Comp      : Ord a => {x, y : a} -> Sorted (x::xs) -> y <= x -> Sorted (y::x::xs)
 
 ||| Sorting with direct encoding of first-order logic formulae of sortedness properties
 sortDirect : (v : Vect n a) -> (s : Vect n a ** (v `Permutation` s, Sorted s))
