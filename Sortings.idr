@@ -10,8 +10,8 @@ count _ Nil = 0
 count x (y :: xs) = (if x == y then FS else weaken) $ count x xs
 
 data ElemCount : Fin (S n) -> a -> Vect n a -> Type where
-  NoElem   :                                                             ElemCount FZ         x []
-  IncHere  : ElemCount c x xs                                         -> ElemCount (FS c)     x (x :: xs)
+  NoElem   :                                    ElemCount FZ         x []
+  IncHere  : ElemCount c x xs                -> ElemCount (FS c)     x (x :: xs)
   IncThere : ElemCount c x xs -> Not (x = y) -> ElemCount (weaken c) x (y :: xs)
 
   -- A variant with non-structural equality
