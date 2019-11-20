@@ -22,8 +22,9 @@ data ElemCount : Fin (S n) -> a -> Vect n a -> Type where
 
 ||| Structural inductive rules for prooving that one vector is a permutation of another.
 data Permutation : Vect n a -> Vect n a -> Type where
-  EmptyPerm : Permutation [] []
-  InsertPerm : {xs : Vect (lm + rm) a} -> {lys : Vect lm a} -> {rys : Vect rm a} -> Permutation xs (lys ++ rys) -> Permutation (x::xs) (rewrite plusSuccRightSucc lm rm in lys ++ x::rys)
+  EmptyPerm  : Permutation [] []
+  InsertPerm : {xs : Vect (lm + rm) a} -> {lys : Vect lm a} -> {rys : Vect rm a}
+            -> Permutation xs (lys ++ rys) -> Permutation (x::xs) (rewrite plusSuccRightSucc lm rm in lys ++ x::rys)
 
 (<=) : Ord a => a -> a -> Type
 x <= y = (x <= y) = True
