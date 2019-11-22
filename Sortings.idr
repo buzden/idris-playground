@@ -34,11 +34,11 @@ data Sorted : Vect n a -> Type where
 isSorted : Ord a => (xs : Vect n a) -> (s : Bool ** if s then Sorted xs else Not (Sorted xs))
 isSorted []  = (True ** Empty)
 isSorted [_] = (True ** Singleton)
-isSorted (y::x::xs) = case y <= x of
-  True => case isSorted (x::xs) of
-    (True  ** prf) => (True ** Comp prf ?prf_less)
+isSorted (y::x::xs) with (y <= x) proof yx
+  | True = case isSorted (x::xs) of
+    (True  ** prf) => (True ** Comp prf (sym yx))
     (False ** prf) => (False ** \(Comp s _) => prf s)
-  False => (False ** ?prf_afloat)
+  | False = (False ** ?prf_afloat)
 
 ||| Sorting with direct encoding of first-order logic formulae of sortedness properties
 sortDirect : (v : Vect n a) -> (s : Vect n a ** (v `Permutation` s, Sorted s))
