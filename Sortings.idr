@@ -36,4 +36,4 @@ data Sorted : Vect n a -> Type where
 
 ||| Sorting with direct encoding of first-order logic formulae of sortedness properties
 sortDirect : (v : Vect n a) -> (s : Vect n a ** (v `Permutation` s, Sorted s))
-sortDirect = ?sortDirect
+sortDirect = ?sortDirect_impl
