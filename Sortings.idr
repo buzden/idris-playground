@@ -34,6 +34,15 @@ data Sorted : Vect n a -> Type where
   Singleton :                                                    Sorted [x]
   Comp      : Ord a => {x, y : a} -> Sorted (x::xs) -> y <= x -> Sorted (y::x::xs)
 
+isSorted : Ord a => (xs : Vect n a) -> (s : Bool ** if s then Sorted xs else Not (Sorted xs))
+isSorted []  = (True ** Empty)
+isSorted [_] = (True ** Singleton)
+isSorted (y::x::xs) = case y <= x of
+  True => case isSorted (x::xs) of
+    (True  ** prf) => (True ** Comp prf ?prf_less)
+    (False ** prf) => (False ** \(Comp s _) => prf s)
+  False => (False ** ?prf_afloat)
+
 ||| Sorting with direct encoding of first-order logic formulae of sortedness properties
 sortDirect : (v : Vect n a) -> (s : Vect n a ** (v `Permutation` s, Sorted s))
 sortDirect = ?sortDirect_impl
