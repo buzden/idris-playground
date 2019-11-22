@@ -26,13 +26,10 @@ data Permutation : Vect n a -> Vect n a -> Type where
   InsertPerm : {lys : Vect lm a} -> {rys : Vect rm a}
             -> Permutation xs (lys ++ rys) -> Permutation (x::xs) (rewrite plusSuccRightSucc lm rm in lys ++ x::rys)
 
-(<=) : Ord a => a -> a -> Type
-x <= y = (x <= y) = True
-
 data Sorted : Vect n a -> Type where
-  Empty     :                                                    Sorted []
-  Singleton :                                                    Sorted [x]
-  Comp      : Ord a => {x, y : a} -> Sorted (x::xs) -> y <= x -> Sorted (y::x::xs)
+  Empty     :                                                           Sorted []
+  Singleton :                                                           Sorted [x]
+  Comp      : Ord a => {x, y : a} -> Sorted (x::xs) -> y <= x = True -> Sorted (y::x::xs)
 
 isSorted : Ord a => (xs : Vect n a) -> (s : Bool ** if s then Sorted xs else Not (Sorted xs))
 isSorted []  = (True ** Empty)
