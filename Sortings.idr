@@ -38,7 +38,7 @@ isSorted (y::x::xs) with (y <= x) proof yx
   | True = case isSorted (x::xs) of
     (True  ** prf) => (True ** Comp prf (sym yx))
     (False ** prf) => (False ** \(Comp s _) => prf s)
-  | False = (False ** ?prf_afloat)
+  | False = (False ** \(Comp _ yxEq) => trueNotFalse . sym $ trans yx yxEq)
 
 ||| Sorting with direct encoding of first-order logic formulae of sortedness properties
 sortDirect : (v : Vect n a) -> (s : Vect n a ** (v `Permutation` s, Sorted s))
