@@ -16,3 +16,7 @@ data ElemCount : Fin (S n) -> a -> Vect n a -> Type where
 
 -- TODO To define permutation through `ElemCount` (probably, the structural one)
 -- TODO   and prove equivalence with the structurally defined permutation property.
+
+||| Permutation property defined through `ElemCount`
+data PermTEC : Vect n a -> Vect n a -> Type where
+  Perm : {xs, ys : Vect n a} -> ({c : Fin (S n)} -> {x : a} -> ElemCount c x xs -> ElemCount c x ys) -> PermTEC xs ys
