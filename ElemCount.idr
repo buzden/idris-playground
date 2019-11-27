@@ -1,6 +1,9 @@
 module ElemCount
 
 import Data.Vect
+import Sortings
+
+%default total
 
 count : Eq a => a -> Vect n a -> Fin (S n)
 count _ Nil = 0
