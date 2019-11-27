@@ -2,6 +2,7 @@ module Sortings
 
 import Data.Fin
 import Data.Vect
+import Data.So
 
 %default total
 
@@ -27,18 +28,25 @@ data Permutation : Vect n a -> Vect n a -> Type where
             -> Permutation xs (lys ++ rys) -> Permutation (x::xs) (rewrite plusSuccRightSucc lm rm in lys ++ x::rys)
 
 data Sorted : Vect n a -> Type where
-  Empty     :                                                           Sorted []
-  Singleton :                                                           Sorted [x]
-  Comp      : Ord a => {x, y : a} -> Sorted (x::xs) -> y <= x = True -> Sorted (y::x::xs)
+  Empty     :                                                         Sorted []
+  Singleton :                                                         Sorted [x]
+  Comp      : Ord a => {x, y : a} -> Sorted (x::xs) -> So (y <= x) -> Sorted (y::x::xs)
+
+soAbsurd : So b -> So (not b) -> Void
+soAbsurd sb snb with (sb)
+  | Oh = uninhabited snb
+
+soNotToNotSo : So (not b) -> Not (So b)
+soNotToNotSo = flip soAbsurd
 
 isSorted : Ord a => (xs : Vect n a) -> (s : Bool ** if s then Sorted xs else Not (Sorted xs))
 isSorted []  = (True ** Empty)
 isSorted [_] = (True ** Singleton)
-isSorted (y::x::xs) with (y <= x) proof yx
-  | True = case isSorted (x::xs) of
-    (True  ** prf) => (True ** Comp prf (sym yx))
+isSorted (y::x::xs) = case choose (y <= x) of
+  Left yx => case isSorted (x::xs) of
+    (True  ** prf) => (True ** Comp prf yx)
     (False ** prf) => (False ** \(Comp s _) => prf s)
-  | False = (False ** \(Comp _ yxEq) => trueNotFalse . sym $ trans yx yxEq)
+  Right yxNEq => (False ** \(Comp _ yxEq) => soAbsurd yxEq yxNEq)
 
 ||| Sorting with direct encoding of first-order logic formulae of sortedness properties
 sortDirect : (v : Vect n a) -> (s : Vect n a ** (v `Permutation` s, Sorted s))
