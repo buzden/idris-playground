@@ -27,10 +27,10 @@ data Permutation : Vect n a -> Vect n a -> Type where
   InsertPerm : {lys : Vect lm a} -> {rys : Vect rm a}
             -> Permutation xs (lys ++ rys) -> Permutation (x::xs) (rewrite plusSuccRightSucc lm rm in lys ++ x::rys)
 
-data Sorted : Vect n a -> Type where
-  Empty     :                                                         Sorted []
-  Singleton :                                                         Sorted [x]
-  Comp      : Ord a => {x, y : a} -> Sorted (x::xs) -> So (y <= x) -> Sorted (y::x::xs)
+data Sorted : {auto ord : Ord a} -> Vect n a -> Type where
+  Empty     : Ord a =>                                             Sorted []
+  Singleton : Ord a =>                                             Sorted [x]
+  Comp      : {x, y : a} -> Sorted {ord} (x::xs) -> So (y <= x) -> Sorted (y::x::xs)
 
 soAbsurd : So b -> So (not b) -> Void
 soAbsurd sb snb with (sb)
@@ -49,5 +49,5 @@ isSorted (y::x::xs) = case choose (y <= x) of
   Right yxNEq => (False ** \(Comp _ yxEq) => soAbsurd yxEq yxNEq)
 
 ||| Sorting with direct encoding of first-order logic formulae of sortedness properties
-sortDirect : (v : Vect n a) -> (s : Vect n a ** (v `Permutation` s, Sorted s))
+sortDirect : Ord a => (v : Vect n a) -> (s : Vect n a ** (v `Permutation` s, Sorted s))
 sortDirect = ?sortDirect_impl
