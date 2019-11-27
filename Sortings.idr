@@ -7,23 +7,28 @@ import Data.So
 %default total
 
 ||| Structural inductive rules for prooving that one vector is a permutation of another.
+public export
 data Permutation : Vect n a -> Vect n a -> Type where
   EmptyPerm  : Permutation [] []
   InsertPerm : {lys : Vect lm a} -> {rys : Vect rm a}
             -> Permutation xs (lys ++ rys) -> Permutation (x::xs) (rewrite plusSuccRightSucc lm rm in lys ++ x::rys)
 
+public export
 data Sorted : {auto ord : Ord a} -> Vect n a -> Type where
   Empty     : Ord a =>                                             Sorted []
   Singleton : Ord a =>                                             Sorted [x]
   Comp      : {x, y : a} -> Sorted {ord} (x::xs) -> So (y <= x) -> Sorted (y::x::xs)
 
+export
 soAbsurd : So b -> So (not b) -> Void
 soAbsurd sb snb with (sb)
   | Oh = uninhabited snb
 
+export
 soNotToNotSo : So (not b) -> Not (So b)
 soNotToNotSo = flip soAbsurd
 
+export
 isSorted : Ord a => (xs : Vect n a) -> (s : Bool ** if s then Sorted xs else Not (Sorted xs))
 isSorted []  = (True ** Empty)
 isSorted [_] = (True ** Singleton)
@@ -34,5 +39,6 @@ isSorted (y::x::xs) = case choose (y <= x) of
   Right yxNEq => (False ** \(Comp _ yxEq) => soAbsurd yxEq yxNEq)
 
 ||| Sorting with direct encoding of first-order logic formulae of sortedness properties
+export
 sortDirect : Ord a => (v : Vect n a) -> (s : Vect n a ** (v `Permutation` s, Sorted s))
 sortDirect = ?sortDirect_impl

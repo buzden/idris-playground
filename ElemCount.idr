@@ -22,4 +22,4 @@ data ElemCount : Fin (S n) -> a -> Vect n a -> Type where
 
 ||| Permutation property defined through `ElemCount`
 data PermTEC : Vect n a -> Vect n a -> Type where
-  Perm : {xs, ys : Vect n a} -> ({c : Fin (S n)} -> {x : a} -> ElemCount c x xs -> ElemCount c x ys) -> PermTEC xs ys
+  PermEc : {xs, ys : Vect n a} -> ({c : Fin (S n)} -> {x : a} -> ElemCount c x xs -> ElemCount c x ys) -> PermTEC xs ys
