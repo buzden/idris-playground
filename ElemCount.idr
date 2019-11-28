@@ -20,10 +20,7 @@ data ElemCount : Fin (S n) -> a -> Vect n a -> Type where
 -- TODO To define permutation through `ElemCount` (probably, the structural one)
 -- TODO   and prove equivalence with the structurally defined permutation property.
 
-||| Permutation property defined through `ElemCount`
-data PermTEC : Vect n a -> Vect n a -> Type where
-  PermEc : {xs, ys : Vect n a} -> ({c : Fin (S n)} -> {x : a} -> ElemCount c x xs -> ElemCount c x ys) -> PermTEC xs ys
-
-permStrToEC : Permutation xs ys -> PermTEC xs ys
-permStrToEC EmptyPerm = PermEc id
-permStrToEC (InsertPerm innerPerm) = ?perm_inner_case
+||| Proof that permutationproperty preserves elements (i.e. preserves elements count)
+permPresElems : Permutation xs ys -> ElemCount n e xs -> ElemCount n e ys
+permPresElems EmptyPerm ec = ec
+permPresElems (InsertPerm innerPerm) ec = ?perm_inner_case
