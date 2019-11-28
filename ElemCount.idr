@@ -15,7 +15,7 @@ data ElemCount : Fin (S n) -> a -> Vect n a -> Type where
   IncThere : ElemCount c x xs -> Not (x = y) -> ElemCount (weaken c) x (y :: xs)
 
   -- A variant with non-structural equality
-  --IncThere : Eq a => {x, y : a} -> ElemCount c x xs -> x == y = False -> ElemCount (weaken c) x (y :: xs)
+  --IncThere : Eq a => {x, y : a} -> ElemCount c x xs -> Not (So (x == y)) -> ElemCount (weaken c) x (y :: xs)
 
 -- TODO To define permutation through `ElemCount` (probably, the structural one)
 -- TODO   and prove equivalence with the structurally defined permutation property.
