@@ -50,9 +50,10 @@ splitSoConj = ?splitSo_impl
 namespace SortedProperties
   export
   valueToType : Ord a => So (Sortings.sorted xs) -> Sorted xs
-  valueToType {xs=[]} _ = Empty
-  valueToType {xs=[_]} _ = Singleton
-  valueToType {xs=y::x::xs} so = let (soyx, soxxs) = splitSoConj so in Comp (valueToType soxxs) soyx
+  valueToType {xs=[]}       _  = Empty
+  valueToType {xs=[_]}      _  = Singleton
+  valueToType {xs=y::x::xs} so = let (soyx, soxxs) = splitSoConj so in
+                                 Comp (valueToType soxxs) soyx
 
   export
   notValueToNotType : Ord a => So (not $ Sortings.sorted xs) -> Not (Sorted xs)
