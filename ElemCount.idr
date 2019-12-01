@@ -23,4 +23,5 @@ data ElemCount : Fin (S n) -> a -> Vect n a -> Type where
 ||| Proof that permutationproperty preserves elements (i.e. preserves elements count)
 permPresElems : Permutation xs ys -> ElemCount n e xs -> ElemCount n e ys
 permPresElems EmptyPerm ec = ec
-permPresElems (InsertPerm innerPerm) ec = ?perm_inner_case
+permPresElems {xs=a::as} (InsertPerm ip) (IncHere iec) = ?perm_here
+permPresElems (InsertPerm ip) (IncThere iec xy) = ?perm_there
