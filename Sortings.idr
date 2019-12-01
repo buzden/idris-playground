@@ -44,8 +44,27 @@ sorted [] = True
 sorted [_] = True
 sorted (y::x::xs) = (y <= x) && sorted (x::xs)
 
+export
+total doubleNotDisappears : (b : Bool) -> not (not b) = b
+doubleNotDisappears True  = Refl
+doubleNotDisappears False = Refl
+
+export
+takeSoConjPart : So b -> So (b && c) -> So c
+takeSoConjPart sb sbc with (sb)
+  takeSoConjPart _ sbc | Oh with (sbc)
+    takeSoConjPart _ _ | Oh | Oh = Oh
+
+export
+soConjAbsurd : So b -> So (not b && c) -> Void
+soConjAbsurd sb sbc with (sb)
+  | Oh = uninhabited sbc
+
+export
 splitSoConj : So (b && c) -> (So b, So c)
-splitSoConj = ?splitSo_impl
+splitSoConj {b} sbc = case choose b of
+  Left sb => (sb, takeSoConjPart sb sbc)
+  Right snb => absurd $ soConjAbsurd snb (rewrite doubleNotDisappears b in sbc)
 
 namespace SortedProperties
   export
