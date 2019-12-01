@@ -38,6 +38,12 @@ isSorted (y::x::xs) = case choose (y <= x) of
     (False ** prf) => (False ** \(Comp s _) => prf s)
   Right yxNEq => (False ** \(Comp _ yxEq) => soAbsurd yxEq yxNEq)
 
+public export
+sorted : Ord a => Vect n a -> Bool
+sorted [] = True
+sorted [_] = True
+sorted (y::x::xs) = (y <= x) && sorted (x::xs)
+
 -- TODO To rewrite isSorted to a `public export sorted : Vect n a -> Bool` function and to a bunch of proof functions
 -- TODO   like `So (sorted xs) -> Sorted xs`, `So (not $ sorted xs) -> Not (Sorted xs)`,
 -- TODO   `Sorted xs -> So (sorted xs)` and `Not (Sorted xs) -> So (not $ sorted xs)`.
