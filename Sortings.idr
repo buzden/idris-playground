@@ -47,7 +47,9 @@ sorted (y::x::xs) = (y <= x) && sorted (x::xs)
 namespace SortedProperties
   export
   valueToType : Ord a => So (Sortings.sorted xs) -> Sorted xs
-  valueToType = ?valueToType_impl
+  valueToType {xs=[]} _ = Empty
+  valueToType {xs=[_]} _ = Singleton
+  valueToType {xs} so = ?valueToType_impl
 
   export
   notValueToNotType : Ord a => So (not $ Sortings.sorted xs) -> Not (Sorted xs)
