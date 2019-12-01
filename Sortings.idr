@@ -10,7 +10,7 @@ import Data.So
 public export
 data Permutation : Vect n a -> Vect n a -> Type where
   EmptyPerm  : Permutation [] []
-  InsertPerm : {lys : Vect lm a} -> {rys : Vect rm a}
+  InsertPerm : {xs : Vect _ a} -> {lys : Vect lm a} -> {rys : Vect rm a}
             -> Permutation xs (lys ++ rys) -> Permutation (x::xs) (rewrite plusSuccRightSucc lm rm in lys ++ x::rys)
 
 public export
@@ -37,6 +37,10 @@ isSorted (y::x::xs) = case choose (y <= x) of
     (True  ** prf) => (True ** Comp prf yx)
     (False ** prf) => (False ** \(Comp s _) => prf s)
   Right yxNEq => (False ** \(Comp _ yxEq) => soAbsurd yxEq yxNEq)
+
+-- TODO To rewrite isSorted to a `public export sorted : Vect n a -> Bool` function and to a bunch of proof functions
+-- TODO   like `So (sorted xs) -> Sorted xs`, `So (not $ sorted xs) -> Not (Sorted xs)`,
+-- TODO   `Sorted xs -> So (sorted xs)` and `Not (Sorted xs) -> So (not $ sorted xs)`.
 
 ||| Sorting with direct encoding of first-order logic formulae of sortedness properties
 export
