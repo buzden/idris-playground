@@ -44,9 +44,22 @@ sorted [] = True
 sorted [_] = True
 sorted (y::x::xs) = (y <= x) && sorted (x::xs)
 
--- TODO To rewrite isSorted to a `public export sorted : Vect n a -> Bool` function and to a bunch of proof functions
--- TODO   like `So (sorted xs) -> Sorted xs`, `So (not $ sorted xs) -> Not (Sorted xs)`,
--- TODO   `Sorted xs -> So (sorted xs)` and `Not (Sorted xs) -> So (not $ sorted xs)`.
+namespace SortedProperties
+  export
+  valueToType : Ord a => {xs : Vect n a} -> So (sorted xs) -> Sorted xs
+  valueToType = ?valueToType_impl
+
+  export
+  notValueToNotType : Ord a => {xs : Vect n a} -> So (not $ sorted xs) -> Not (Sorted xs)
+  notValueToNotType = ?notValueToNotType_impl
+
+  export
+  typeToValue : Ord a => Sorted xs -> So (sorted xs)
+  typeToValue = ?typeToValue_impl
+
+  export
+  notTypeToNotValue : Ord a => Not (Sorted xs) -> So (not $ sorted xs)
+  notTypeToNotValue = ?notTypeToNotValue_impl
 
 ||| Sorting with direct encoding of first-order logic formulae of sortedness properties
 export
