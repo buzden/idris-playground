@@ -46,19 +46,19 @@ sorted (y::x::xs) = (y <= x) && sorted (x::xs)
 
 namespace SortedProperties
   export
-  valueToType : Ord a => {xs : Vect n a} -> So (sorted xs) -> Sorted xs
+  valueToType : Ord a => So (Sortings.sorted xs) -> Sorted xs
   valueToType = ?valueToType_impl
 
   export
-  notValueToNotType : Ord a => {xs : Vect n a} -> So (not $ sorted xs) -> Not (Sorted xs)
+  notValueToNotType : Ord a => So (not $ Sortings.sorted xs) -> Not (Sorted xs)
   notValueToNotType = ?notValueToNotType_impl
 
   export
-  typeToValue : Ord a => Sorted xs -> So (sorted xs)
+  typeToValue : Ord a => Sorted xs -> So (Sortings.sorted xs)
   typeToValue = ?typeToValue_impl
 
   export
-  notTypeToNotValue : Ord a => Not (Sorted xs) -> So (not $ sorted xs)
+  notTypeToNotValue : Ord a => Not (Sorted xs) -> So (not $ Sortings.sorted xs)
   notTypeToNotValue = ?notTypeToNotValue_impl
 
 ||| Sorting with direct encoding of first-order logic formulae of sortedness properties
