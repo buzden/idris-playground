@@ -60,11 +60,10 @@ soConjAbsurd : So b -> So (not b && c) -> Void
 soConjAbsurd sb sbc with (sb)
   | Oh = uninhabited sbc
 
-export
+export total
 splitSoConj : So (b && c) -> (So b, So c)
-splitSoConj {b} sbc = case choose b of
-  Left sb => (sb, takeSoConjPart sb sbc)
-  Right snb => absurd $ soConjAbsurd snb (rewrite doubleNotDisappears b in sbc)
+splitSoConj {b=True} sbc with (sbc)
+  | Oh = (Oh, Oh)
 
 namespace SortedProperties
   export
