@@ -19,7 +19,7 @@ mutual
   unUqt Nil = Nil
   unUqt (x::xs) = x::(unUqt xs)
 
-x : {auto uqt : Uqt 3 a {eq}} -> Vect 3 a
+x : {auto uqt : Uqt n a {eq}} -> Vect n a
 x {uqt} = unUqt uqt
 
 data X = A | B | C
