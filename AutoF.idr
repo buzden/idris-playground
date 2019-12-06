@@ -17,19 +17,41 @@ data Uqt : (n : Nat) -> (a : Type) -> {auto eq : Eq a} -> Vect n a -> Type where
 unUqt : Eq a => Uqt n a xs -> Vect n a
 unUqt {xs} _ = xs
 
-x : {auto uqt : Uqt 3 String xs} -> Vect 3 String
+x : Eq a => {auto uqt : Uqt 3 a xs} -> Vect 3 a
 x {uqt} = unUqt uqt
 
--- %hint
-a : String
-a = "asdf"
+data X = A | B | C
 
-u : (xs ** Uqt 3 String xs)
-u = (_ ** ["a", "b", "c"])
+Eq X where
+  A == A = True
+  B == B = True
+  C == C = True
+  _ == _ = False
 
-y : Vect 3 String
-y =
-  let a = "asdf" in
-  let b = "asdg" in
-  let c = "asdh" in
+%hint
+a : X
+a = A
+
+%hint
+b : X
+b = B
+
+%hint
+c : X
+c = C
+
+uS : (xs ** Uqt 3 String xs)
+uS = (_ ** ["a", "b", "c"])
+
+uX : (xs ** Uqt 3 X xs)
+uX = (_ ** [A, B, C])
+
+yHint : Vect 3 X
+yHint = x
+
+yLoc : Vect 3 X
+yLoc =
+  let a = A in
+  let b = B in
+  let c = C in
   ?x
