@@ -2,20 +2,12 @@ module AutoF
 
 import Data.So
 import Data.Vect
+import Data.Vect.Quantifiers
 
 %default total
 
 notEq : Eq a -> (x : a) -> (y : a) -> Type
 notEq eq x y = So (x /= y)
-
-namespace Quantifiers
-  ||| A proof that all elements of a vector satisfy a property. It is a list of
-  ||| proofs, corresponding element-wise to the `Vect`.
-  -- Copied from Idris 1's base's Data.Vect.Quantifiers
-  public export
-  data All : (P : a -> Type) -> Vect n a -> Type where
-    Nil : {P : a -> Type} -> All P Nil
-    (::) : {P : a -> Type} -> {xs : Vect n a} -> P x -> All P xs -> All P (x :: xs)
 
 mutual
   ||| Uqtor (uniquetor): a vector with unique values (according to `Eq`)
