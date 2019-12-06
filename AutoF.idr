@@ -30,6 +30,12 @@ Eq X where
   C == C = True
   _ == _ = False
 
+uS : Uqt 3 String
+uS = ["a", "b", "c"]
+
+uX : Uqt 3 X
+uX = [A, B, C]
+
 %hint
 a : X
 a = A
@@ -42,14 +48,8 @@ b = B
 c : X
 c = C
 
-uS : Uqt 3 String
-uS = ["a", "b", "c"]
-
-uX : Uqt 3 X
-uX = [A, B, C]
-
 yHint : Vect 3 X
-yHint = x
+yHint = ?x
 
 yLoc : Vect 3 X
 yLoc =
