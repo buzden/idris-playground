@@ -51,6 +51,9 @@ c = C
 yF : Vect 1 X
 yF = x
 
+yG : Vect 2 X
+yG = ?x
+
 yHint : Vect 3 X
 yHint = ?x
 
