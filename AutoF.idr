@@ -24,8 +24,8 @@ x {uqt} = unUqt uqt
 a : String
 a = "asdf"
 
-u : Uqt 3 String xs
-u = ["a", "b", "c"]
+u : (xs ** Uqt 3 String xs)
+u = (_ ** ["a", "b", "c"])
 
 y : Vect 3 String
 y =
