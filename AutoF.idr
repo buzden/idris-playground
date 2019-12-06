@@ -12,6 +12,7 @@ namespace Quantifiers
   ||| A proof that all elements of a vector satisfy a property. It is a list of
   ||| proofs, corresponding element-wise to the `Vect`.
   -- Copied from Idris 1's base's Data.Vect.Quantifiers
+  public export
   data All : (P : a -> Type) -> Vect n a -> Type where
     Nil : {P : a -> Type} -> All P Nil
     (::) : {P : a -> Type} -> {xs : Vect n a} -> P x -> All P xs -> All P (x :: xs)
@@ -55,18 +56,21 @@ b = B
 c : X
 c = C
 
+y0 : Vect 0 X
+y0 = x
+
 yF : Vect 1 X
 yF = x
 
 yG : Vect 2 X
-yG = ?x
+yG = ?yG_rhs
 
 yHint : Vect 3 X
-yHint = ?x
+yHint = ?yHint_rhs
 
 yLoc : Vect 3 X
 yLoc =
   let a = A in
   let b = B in
   let c = C in
-  ?x
+  ?yLoc_rhs
