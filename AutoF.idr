@@ -16,7 +16,7 @@ mutual
     (::) : (x : a) -> (xs : Uqt n a {eq}) -> {auto ev : All (notEq eq x) (unUqt xs)} -> Uqt (S n) a
 
   unUqt : Uqt n a {eq} -> Vect n a
-  unUqt Nil = Nil
+  unUqt Nil     = Nil
   unUqt (x::xs) = x::(unUqt xs)
 
 x : {auto uqt : Uqt n a {eq}} -> Vect n a
@@ -47,6 +47,9 @@ b = B
 %hint
 c : X
 c = C
+
+yF : Vect 1 X
+yF = x
 
 yHint : Vect 3 X
 yHint = ?x
