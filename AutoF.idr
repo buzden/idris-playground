@@ -10,10 +10,10 @@ notEq : Eq a -> (x : a) -> (y : a) -> Type
 notEq eq x y = So (x /= y)
 
 mutual
-  ||| Uqtor (uniquetor): a vector with unique values (according to `Eq`)
+  ||| Uqtor (uniquetor), a vector with unique values (according to `Eq`)
   data Uqt : (n : Nat) -> (a : Type) -> {auto eq : Eq a} -> Type where
     Nil  : Eq a => Uqt Z a
-    (::) : (x : a) -> (xs : Uqt n a {eq}) -> {auto ev : All (notEq eq x) (unUqt xs)} -> Uqt (S n) a
+    (::) : (x : a) -> (xs : Uqt n a {eq}) -> {auto unq : All (notEq eq x) (unUqt xs)} -> Uqt (S n) a
 
   unUqt : Uqt n a {eq} -> Vect n a
   unUqt Nil     = Nil
