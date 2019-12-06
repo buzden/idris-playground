@@ -19,8 +19,8 @@ mutual
   unUqt Nil     = Nil
   unUqt (x::xs) = x::(unUqt xs)
 
-x : {auto uqt : Uqt n a {eq}} -> Vect n a
-x {uqt} = unUqt uqt
+summon : {auto u : a} -> a
+summon {u} = u
 
 data X = A | B | C
 
@@ -30,9 +30,11 @@ Eq X where
   C == C = True
   _ == _ = False
 
+-- just testing Uqt
 uS : Uqt 3 String
 uS = ["a", "b", "c"]
 
+-- just testing Uqt
 uX : Uqt 3 X
 uX = [A, B, C]
 
@@ -48,19 +50,19 @@ b = B
 c : X
 c = C
 
-y0 : Vect 0 X
-y0 = x
+y0 : Uqt 0 X
+y0 = summon
 
-yF : Vect 1 X
-yF = x
+yF : Uqt 1 X
+yF = summon
 
-yG : Vect 2 X
+yG : Uqt 2 X
 yG = ?yG_rhs
 
-yHint : Vect 3 X
+yHint : Uqt 3 X
 yHint = ?yHint_rhs
 
-yLoc : Vect 3 X
+yLoc : Uqt 3 X
 yLoc =
   let a = A in
   let b = B in
