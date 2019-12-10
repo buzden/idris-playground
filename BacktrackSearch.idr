@@ -4,7 +4,7 @@ import Data.So
 
 %default total
 
-data X = A | B
+data X = A | B | C
 
 Eq X where
   A == A = True
