@@ -14,11 +14,6 @@ SprintfType ('%' :: 'c' :: rest) = Char    -> SprintfType rest
 SprintfType ('%' :: _   :: rest) = Void    -> SprintfType rest
 SprintfType (_   :: rest)        =            SprintfType rest
 
-f : (k : Char) -> SprintfType (k :: rest) -> SprintfType rest
-f k s with (decEq k '%')
-  | (Yes p) = ?f_rhs1
-  | (No p)  = ?f_rhs2
-
 sprintf' : List Char -> (str : List Char) -> SprintfType str
 sprintf' curr []                   = curr
 sprintf' curr ('%' :: '%' :: rest) = sprintf' (curr ++ ['%']) rest
