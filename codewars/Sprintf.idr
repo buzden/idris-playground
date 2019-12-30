@@ -4,27 +4,29 @@ module Sprintf
 %default total
 
 public export
-SprintfType : String -> Type
-SprintfType x = case strM x of
-  StrNil => String
-  ('%' `StrCons` qual) => case strM qual of
-    ('%' `StrCons` rest) => SprintfType rest
-    ('d' `StrCons` rest) => Integer -> SprintfType rest
-    ('f' `StrCons` rest) => Double  -> SprintfType rest
-    ('c' `StrCons` rest) => Char    -> SprintfType rest
-    _                    => Void    -> String
-  (_ `StrCons` rest) => SprintfType rest
+SprintfType : List Char -> Type
+SprintfType []                   =            List Char
+SprintfType ('%' :: Nil)         = Void    -> List Char
+SprintfType ('%' :: '%' :: rest) =            SprintfType rest
+SprintfType ('%' :: 'd' :: rest) = Integer -> SprintfType rest
+SprintfType ('%' :: 'f' :: rest) = Double  -> SprintfType rest
+SprintfType ('%' :: 'c' :: rest) = Char    -> SprintfType rest
+SprintfType ('%' :: _   :: rest) = Void    -> SprintfType rest
+SprintfType (_   :: rest)        =            SprintfType rest
 
-sprintf' : String -> (str : String) -> SprintfType str
-sprintf' curr str with (strM str)
-  sprintf' curr "" | StrNil = curr
-  | ('%' `StrCons` qual) with (strM qual)
-    | _ | ('%' `StrCons` rest) = sprintf (curr ++ "%") rest
-    | _ | ('d' `StrCons` rest) = \n => sprintf (curr ++ show n) rest
-    | _ | ('f' `StrCons` rest) = \n => sprintf (curr ++ show n) rest
-    | _ | ('c' `StrCons` rest) = \n => sprintf (curr ++ show n) rest
-    | _ | _                    = \n => absurd n
-  | (k `StrCons` rest) = sprintf (curr ++ singleton k) rest
+f : (k : Char) -> SprintfType (k :: rest) -> SprintfType rest
+f k s with (decEq k '%')
+  | (Yes p) = ?f_rhs1
+  | (No p)  = ?f_rhs2
 
-sprintf : (str : String) -> SprintfType str
-sprintf = sprintf' ""
+sprintf' : List Char -> (str : List Char) -> SprintfType str
+sprintf' curr []                   = curr
+sprintf' curr ('%' :: '%' :: rest) = sprintf' (curr ++ ['%']) rest
+sprintf' curr ('%' :: 'd' :: rest) = \n => sprintf' (curr ++ unpack (show n)) rest
+sprintf' curr ('%' :: 'f' :: rest) = \n => sprintf' (curr ++ unpack (show n)) rest
+sprintf' curr ('%' :: 'c' :: rest) = \n => sprintf' (curr ++ unpack (show n)) rest
+--sprintf' curr ('%' :: _)           = void
+sprintf' curr (k   :: rest)        = ?sp_rhs -- sprintf' (curr ++ [k]) rest
+
+--sprintf : (str : String) -> SprintfType (unpack str)
+--sprintf = pack . sprintf' [] . unpack
