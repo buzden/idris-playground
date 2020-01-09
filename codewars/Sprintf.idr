@@ -13,6 +13,5 @@ strToSty c ('%'::'c'::ks) = (_ ** \k : Char    => snd $ strToSty (c ++ singleton
 strToSty c ('%':: ks)     = (_ ** \v : Void    => snd $ strToSty c ks)
 strToSty c ( k :: ks)     = strToSty (c ++ singleton k) ks
 
-public export
 sprintf : (str : String) -> fst (strToSty "" $ unpack str)
 sprintf str = snd (strToSty "" $ unpack str)
