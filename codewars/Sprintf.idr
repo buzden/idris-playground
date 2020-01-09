@@ -34,5 +34,13 @@ strToSty ('%'::'c'::ks) = let (_ ** sub) = strToSty ks in (_ ** CharDemand sub)
 strToSty ('%':: _ ::ks) = let (_ ** sub) = strToSty ks in (_ ** BadDemand sub)
 strToSty ( k :: ks)     = let (_ ** sub) = strToSty ks in (_ ** Ordinary k sub)
 
---sprintf : (str : String) -> SprintfType (unpack str)
---sprintf = pack . sprintf' [] . unpack
+sprintf' : List Char -> Sty t -> t
+sprintf' c []                = reverse c
+sprintf' c (Ordinary k tl)   = sprintf' (k::c) tl
+sprintf' c (IntDemand tl)    = \n => sprintf' (unpack (show n) ++ c) tl
+sprintf' c (DoubleDemand tl) = \x => sprintf' (unpack (show x) ++ c) tl
+sprintf' c (CharDemand tl)   = \k => sprintf' (k::c) tl
+sprintf' c (BadDemand tl)    = void
+
+sprintf : (str : String) -> {default (strToSty str) sty : Sty t} -> t
+sprintf str {sty} = sprintf' [] sty
