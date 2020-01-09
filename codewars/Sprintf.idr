@@ -4,17 +4,6 @@ module Sprintf
 %default total
 
 public export
-SprintfType : List Char -> Type
-SprintfType []                   =            List Char
-SprintfType ('%' :: Nil)         = Void    -> List Char
-SprintfType ('%' :: '%' :: rest) =            SprintfType rest
-SprintfType ('%' :: 'd' :: rest) = Integer -> SprintfType rest
-SprintfType ('%' :: 'f' :: rest) = Double  -> SprintfType rest
-SprintfType ('%' :: 'c' :: rest) = Char    -> SprintfType rest
-SprintfType ('%' :: _   :: rest) = Void    -> SprintfType rest
-SprintfType (_   :: rest)        =            SprintfType rest
-
-public export
 data Sty : Type -> Type where
   Nil          : Sty (List Char)
   Ordinary     : (k : Char) -> (tl : Sty t) -> Sty t
