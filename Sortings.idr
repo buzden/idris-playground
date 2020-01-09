@@ -74,12 +74,12 @@ namespace SortedProperties
                                  Comp (valueToType soxxs) soyx
 
   export
-  notValueToNotType : Ord a => So (not $ Sortings.sorted xs) -> Not (Sorted xs)
-  notValueToNotType = ?notValueToNotType_impl
-
-  export
   typeToValue : Ord a => Sorted xs -> So (Sortings.sorted xs)
   typeToValue = ?typeToValue_impl
+
+  export
+  notValueToNotType : Ord a => So (not $ Sortings.sorted xs) -> Not (Sorted xs)
+  notValueToNotType = ?notValueToNotType_impl
 
   export
   notTypeToNotValue : Ord a => Not (Sorted xs) -> So (not $ Sortings.sorted xs)
