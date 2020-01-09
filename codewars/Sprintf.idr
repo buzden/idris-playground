@@ -34,6 +34,7 @@ strToSty ('%'::'c'::ks) = let (_ ** sub) = strToSty ks in (_ ** CharDemand sub)
 strToSty ('%':: _ ::ks) = let (_ ** sub) = strToSty ks in (_ ** BadDemand sub)
 strToSty ( k :: ks)     = let (_ ** sub) = strToSty ks in (_ ** Ordinary k sub)
 
+public export
 sprintf' : List Char -> Sty t -> t
 sprintf' c []                = reverse c
 sprintf' c (Ordinary k tl)   = sprintf' (k::c) tl
@@ -42,5 +43,6 @@ sprintf' c (DoubleDemand tl) = \x => sprintf' (unpack (show x) ++ c) tl
 sprintf' c (CharDemand tl)   = \k => sprintf' (k::c) tl
 sprintf' c (BadDemand tl)    = void
 
-sprintf : (str : String) -> {default (strToSty str) sty : Sty t} -> t
-sprintf str {sty} = sprintf' [] sty
+public export
+sprintf : (str : String) -> fst $ strToSty $ unpack str
+sprintf str = sprintf' [] $ snd $ strToSty $ unpack str
