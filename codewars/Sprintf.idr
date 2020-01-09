@@ -5,7 +5,7 @@ module Sprintf
 
 public export
 data Sty : Type -> Type where
-  Nil          : Sty (List Char)
+  Nil          : Sty String
   Ordinary     : (k : Char) -> (tl : Sty t) -> Sty t
   IntDemand    :               (tl : Sty t) -> Sty (Integer -> t)
   DoubleDemand :               (tl : Sty t) -> Sty (Double -> t)
@@ -25,7 +25,7 @@ strToSty ( k :: ks)     = let (_ ** sub) = strToSty ks in (_ ** Ordinary k sub)
 
 public export
 sprintf' : List Char -> Sty t -> t
-sprintf' c []                = reverse c
+sprintf' c []                = pack $ reverse c
 sprintf' c (Ordinary k tl)   = sprintf' (k::c) tl
 sprintf' c (IntDemand tl)    = \n => sprintf' (unpack (show n) ++ c) tl
 sprintf' c (DoubleDemand tl) = \x => sprintf' (unpack (show x) ++ c) tl
