@@ -21,43 +21,49 @@ data Odd : Nat -> Type where
 -- Notice how I use the axioms here.
 evenPlusOne : Even n -> Odd (S n)
 evenPlusOne  ZeroEven    = OneOdd
-evenPlusOne (NextEven n) = NextOdd $ evenPlusOne n
+evenPlusOne (NextEven x) = NextOdd $ evenPlusOne x
 
 -- | Proves that if n is odd, n+1 is even.
 oddPlusOne : Odd n -> Even (S n)
 oddPlusOne  OneOdd     = NextEven $ ZeroEven
-oddPlusOne (NextOdd n) = NextEven $ oddPlusOne n
+oddPlusOne (NextOdd x) = NextEven $ oddPlusOne x
 
 -- | Proves even + even = even
 evenPlusEven : Even n -> Even m -> Even (n + m)
-evenPlusEven  ZeroEven    m = m
-evenPlusEven (NextEven n) m = NextEven $ evenPlusEven n m
+evenPlusEven  ZeroEven    y = y
+evenPlusEven (NextEven x) y = NextEven $ evenPlusEven x y
 
 -- | Proves odd + odd = even
 oddPlusOdd : Odd n -> Odd m -> Even (n + m)
-oddPlusOdd = ?oddPlusOdd_rhs
+oddPlusOdd OneOdd      y = oddPlusOne y
+oddPlusOdd (NextOdd x) y = NextEven $ oddPlusOdd x y
 
 -- | Proves even + odd = odd
 evenPlusOdd : Even n -> Odd m -> Odd (n + m)
-evenPlusOdd = ?evenPlusOdd_rhs
+evenPlusOdd ZeroEven     y = y
+evenPlusOdd (NextEven x) y = NextOdd $ evenPlusOdd x y
 
 -- | Proves odd + even = odd
 oddPlusEven : Odd n -> Even m -> Odd (n + m)
-oddPlusEven = ?oddPlusEven_rhs
+oddPlusEven OneOdd      y = evenPlusOne y
+oddPlusEven (NextOdd x) y = NextOdd $ oddPlusEven x y
 
 -- | Proves even * even = even
 evenTimesEven : Even n -> Even m -> Even (n * m)
-evenTimesEven = ?evenTimesEven_rhs
+evenTimesEven ZeroEven     _ = ZeroEven
+evenTimesEven (NextEven x) y = evenPlusEven y $ evenPlusEven y $ evenTimesEven x y
 
 -- | Proves odd * odd = odd
 oddTimesOdd : Odd n -> Odd m -> Odd (n * m)
-oddTimesOdd = ?oddTimesOdd_rhs
+oddTimesOdd OneOdd {m}  y = rewrite plusZeroRightNeutral m in y
+oddTimesOdd (NextOdd x) y = oddPlusEven y $ oddPlusOdd y $ oddTimesOdd x y
 
 -- | Proves even * odd = even
 evenTimesOdd : Even n -> Odd m -> Even (n * m)
-evenTimesOdd = ?evenTimesOdd_rhs
+evenTimesOdd ZeroEven y = ZeroEven
+evenTimesOdd (NextEven x) y = oddPlusOdd y $ oddPlusEven y $ evenTimesOdd x y
 
 -- | Proves odd * even = even
 oddTimesEven : Odd n -> Even m -> Even (n * m)
-oddTimesEven = ?oddTimesEven_rhs
-
+oddTimesEven OneOdd {m}  y = rewrite plusZeroRightNeutral m in y
+oddTimesEven (NextOdd x) y = evenPlusEven y $ evenPlusEven y $ oddTimesEven x y
