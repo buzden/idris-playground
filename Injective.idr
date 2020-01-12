@@ -2,5 +2,8 @@ module Injective
 
 %default total
 
-interface Injective (ty : Type) (op : ty -> ty) where
-  inj : (a : ty) -> (b : ty) -> op a = op b -> a = b
+interface Injective (op : t -> t) where
+  inj : (a : t) -> (b : t) -> op a = op b -> a = b
+
+  inj' : {a : t} -> {b : t} -> op a = op b -> a = b
+  inj' {a} {b} = inj a b
