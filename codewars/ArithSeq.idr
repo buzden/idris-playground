@@ -25,18 +25,18 @@ namespace Preloaded
   arithFormula : Nat -> Nat
   arithFormula n = half $ n * (n + 1)
 
-lemma_half_puts_out : (k, x : Nat) -> half ((k + k) + x) = k + half x
+lemma_half_puts_out : (k, x : Nat) -> half (k + (k + x)) = k + half x
 lemma_half_puts_out Z     x = Refl
-lemma_half_puts_out (S k) x = rewrite plusCommutative k (S k) in
+lemma_half_puts_out (S k) x = rewrite sym $ plusSuccRightSucc k (k + x) in
                               rewrite lemma_half_puts_out k x in
                               Refl
 
 arithEq : (n : Nat) -> arithFormula n = arithSum n
 arithEq Z     = Refl
-arithEq (S k) = rewrite multRightSuccPlus k (k + 1) in
-                rewrite plusAssociative (k + 1) k (k * (k + 1)) in
-                rewrite plusCommutative k 1 in
-                rewrite lemma_half_puts_out k (k * S k) in
+arithEq (S k) = rewrite plusCommutative k 1 in
+                rewrite multCommutative k (S (S k)) in
+                rewrite lemma_half_puts_out k (k + k*k) in
+                rewrite multCommutative (S k) k in
                 rewrite plusCommutative 1 k in
                 rewrite arithEq k in
                 Refl
