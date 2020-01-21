@@ -40,8 +40,8 @@ isSorted (y::x::xs) = case choose (y <= x) of
 
 public export
 sorted : Ord a => Vect n a -> Bool
-sorted [] = True
-sorted [_] = True
+sorted []         = True
+sorted [_]        = True
 sorted (y::x::xs) = (y <= x) && sorted (x::xs)
 
 export
