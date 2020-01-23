@@ -29,15 +29,13 @@ Add (Cos a) Coz     = Cos a
 Add Coz     (Cos b) = Cos b
 Add (Cos a) (Cos b) = Cos $ Cos $ Add a b
 
-partial
+biX : (x : Conat) -> Bisimulation x x
+biX Coz     = Biz
+biX (Cos x) = Bis $ biX x
+
+total
 plusCommutative : (a : Conat) -> (b : Conat) -> Bisimulation (Add a b) (Add b a)
 plusCommutative Coz     Coz     = Biz
-plusCommutative Coz     (Cos y) = let u = plusCommutative Coz y in
-                                  case y of
-                                    Coz   => Bis Biz
-                                    Cos b => Bis u
-plusCommutative (Cos x) Coz     = let u = plusCommutative x Coz in
-                                  case x of
-                                    Coz   => Bis Biz
-                                    Cos a => Bis u
+plusCommutative Coz     (Cos y) = biX $ Cos y
+plusCommutative (Cos x) Coz     = biX $ Cos x
 plusCommutative (Cos x) (Cos y) = Bis $ Bis $ plusCommutative x y
