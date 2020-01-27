@@ -8,7 +8,7 @@ namespace Preloaded
   ||| the quotient and the remainder as a boolean value:
   ||| True = remainder is 1, False = remainder is 0.
   divMod2 : Nat -> (Nat, Bool)
-  divMod2 Z = (Z, False)
+  divMod2 Z     = (Z, False)
   divMod2 (S Z) = (Z, True)
   divMod2 (S (S n)) = case divMod2 n of (q, r) => (S q, r)
 
@@ -30,7 +30,7 @@ namespace Preloaded
 
 -- The following lemma is useful
 divMod2Lemma : (n : Nat) -> n = 2 * fst (divMod2 n) + if snd (divMod2 n) then 1 else 0
-divMod2Lemma Z = Refl
+divMod2Lemma Z     = Refl
 divMod2Lemma (S Z) = Refl
 divMod2Lemma (S (S k)) with (divMod2 k) proof eq
     | (q, r) = ?complete_a_proof
