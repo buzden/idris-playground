@@ -33,7 +33,10 @@ divMod2Lemma : (n : Nat) -> n = 2 * fst (divMod2 n) + if snd (divMod2 n) then 1 
 divMod2Lemma Z     = Refl
 divMod2Lemma (S Z) = Refl
 divMod2Lemma (S (S k)) with (divMod2 k) proof eq
-    | (q, r) = ?complete_a_proof
+    | (q, _) = rewrite divMod2Lemma k in
+               rewrite sym eq in
+               rewrite sym $ plusSuccRightSucc q (q + 0) in
+               Refl
 
 powEq : (b, e : Nat) -> powSqr b e = power b e
 powEq = ?write_a_proof
