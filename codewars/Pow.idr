@@ -39,5 +39,14 @@ divMod2Lemma (S (S k)) with (divMod2 k) proof eq
                Refl
 
 powEq : (b, e : Nat) -> powSqr b e = power b e
-powEq = ?write_a_proof
-
+powEq b k with (divMod2 k) proof eq
+  | (q, p) = rewrite divMod2Lemma k in
+             rewrite sym eq in
+             rewrite plusZeroRightNeutral q in
+             case q of
+               Z     => case p of
+                 True  => Refl
+                 False => Refl
+               (S z) => case p of
+                 True  => ?proof_rhs_3
+                 False => ?proof_rhs_4
