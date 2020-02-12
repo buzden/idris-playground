@@ -26,12 +26,15 @@ namespace Preloaded
 
 -- Task 1. Prove that the successor of a Nat cannot be ≤ zero.
 notSuccLteZero : Not (S n `LTE` Z)
-notSuccLteZero = ?task1
+notSuccLteZero LTEZero     impossible
+notSuccLteZero (LTESucc _) impossible
 
 -- Task 2. Prove that you can add any Nat to the right side of a ≤-property.
 
 lteStepK : (k : Nat) -> m `LTE` n -> m `LTE` k + n
-lteStepK = ?task2
+lteStepK k                 LTEZero     = LTEZero
+lteStepK k {m=S m} {n=S n} (LTESucc x) = rewrite sym $ plusSuccRightSucc k n in
+                                         LTESucc $ lteStepK k x
 
 -- Task 3. Prove that you can remove "addition on the left" from both sides of a ≤-property.
 
