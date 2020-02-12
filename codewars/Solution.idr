@@ -37,7 +37,8 @@ lteStepK _ = ltePlus LTEZero
 -- Task 3. Prove that you can remove "addition on the left" from both sides of a ≤-property.
 
 plusLteInjLeft : (a : Nat) -> a + b `LTE` a + c -> b `LTE` c
-plusLteInjLeft = ?task3
+plusLteInjLeft Z     abc         = abc
+plusLteInjLeft (S k) (LTESucc x) = plusLteInjLeft k x
 
 -- Task 4. Prove that you can remove "multiplication on the left" from both sides of a <-property.
 
