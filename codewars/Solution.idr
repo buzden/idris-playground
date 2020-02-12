@@ -32,9 +32,7 @@ notSuccLteZero (LTESucc _) impossible
 -- Task 2. Prove that you can add any Nat to the right side of a ≤-property.
 
 lteStepK : (k : Nat) -> m `LTE` n -> m `LTE` k + n
-lteStepK k                 LTEZero     = LTEZero
-lteStepK k {m=S m} {n=S n} (LTESucc x) = rewrite sym $ plusSuccRightSucc k n in
-                                         LTESucc $ lteStepK k x
+lteStepK _ = ltePlus LTEZero
 
 -- Task 3. Prove that you can remove "addition on the left" from both sides of a ≤-property.
 
