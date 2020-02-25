@@ -11,5 +11,12 @@ namespace Preloaded
 %access export
 %default total
 
+lemma : (xs : List x) -> (y : x) -> rev (xs ++ [y]) = y :: rev xs
+lemma []      _ = Refl
+lemma (_::as) y = rewrite lemma as y in Refl
+
 revrevid : (a : List x) -> (rev (rev a)) = a
-revrevid = ?oh_my_god_how_do_I_prove_this
+revrevid []      = Refl
+revrevid (a::as) = rewrite lemma (rev as) a in
+                   rewrite revrevid as in
+                   Refl
