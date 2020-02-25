@@ -60,5 +60,22 @@ multLtInjLeft {a=S a} {b=S b} {c=S c} = rewrite succGoesOut b b a in
 
 -- Task 5. Prove this.
 
+lteDelta : x `LTE` y -> (d ** x + d = y)
+lteDelta {y} LTEZero = (y ** Refl)
+lteDelta {x=S x} {y=S y} (LTESucc lte) = (_ ** cong {f=S} $ snd $ lteDelta lte)
+
+lteCutLeft : c + a `LTE` b -> a `LTE` b
+lteCutLeft {c=Z}   = id
+lteCutLeft {c=S k} = lteCutLeft . lteSuccLeft
+
+multLtCross'delta : (delta : Nat ** c + delta = a) -> a * b `LT` c * d -> b `LT` d
+multLtCross'delta (delta ** prf) {b} {c} =
+  rewrite sym prf in
+  rewrite plusCommutative c delta in
+  rewrite multDistributesOverPlusLeft delta c b in
+  rewrite plusSuccRightSucc (delta * b) (c * b) in
+  multLtInjLeft . lteCutLeft
+
 multLtCross : a * b `LT` c * d -> c `LTE` a -> b `LT` d
-multLtCross = ?task5
+multLtCross {a} {c} abcd ca = let (delta ** prf) = lteDelta ca in
+                              multLtCross'delta (lteDelta ca) abcd
