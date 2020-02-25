@@ -26,8 +26,7 @@ namespace Preloaded
 
 -- Task 1. Prove that the successor of a Nat cannot be ≤ zero.
 notSuccLteZero : Not (S n `LTE` Z)
-notSuccLteZero LTEZero     impossible
-notSuccLteZero (LTESucc _) impossible
+notSuccLteZero LTEZero impossible
 
 -- Task 2. Prove that you can add any Nat to the right side of a ≤-property.
 
@@ -42,8 +41,22 @@ plusLteInjLeft (S k) (LTESucc x) = plusLteInjLeft k x
 
 -- Task 4. Prove that you can remove "multiplication on the left" from both sides of a <-property.
 
+succGoesOut : (x, y, a : Nat) -> x + a * (S y) = a + (x + a * y)
+succGoesOut x y a = rewrite multRightSuccPlus a y in
+                    rewrite plusCommutative x $ a + (a*y) in
+                    rewrite sym $ plusAssociative a (a*y) x in
+                    rewrite plusCommutative (a*y) x in
+                    Refl
+
 multLtInjLeft : a * b `LT` a * c -> b `LT` c
-multLtInjLeft = ?task4
+multLtInjLeft {a=Z}   {b}     {c}     = \LTEZero impossible
+multLtInjLeft {a=S a} {b=Z}   {c=Z}   = rewrite multZeroRightZero a in id
+multLtInjLeft {a=S a} {b=Z}   {c=S c} = \_ => LTESucc LTEZero
+multLtInjLeft {a=S a} {b=S b} {c=Z}   = rewrite multZeroRightZero a in \LTEZero impossible
+multLtInjLeft {a=S a} {b=S b} {c=S c} = rewrite succGoesOut b b a in
+                                        rewrite succGoesOut c c a in
+                                        rewrite plusSuccRightSucc a $ b + a*b in
+                                        \(LTESucc lt) => LTESucc . multLtInjLeft {a=S a} $ plusLteInjLeft a lt
 
 -- Task 5. Prove this.
 
