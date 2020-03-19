@@ -13,7 +13,7 @@ AxiomDNE : Type
 AxiomDNE = {a : Type} -> ((a -> Void) -> Void) -> a
 
 from : AxiomDNE -> AxiomPEM
-from dne ri nri = dne $ \bv => bv . nri $ (bv . ri)
+from dne ri nri = dne $ \bv => bv . nri $ bv . ri
 
 to : AxiomPEM -> AxiomDNE
-to pem notnota = pem id $ absurd . notnota
+to pem = pem id . (absurd .)
