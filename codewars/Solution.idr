@@ -77,5 +77,4 @@ multLtCross'delta (delta ** prf) {b} {c} =
   multLtInjLeft . lteCutLeft
 
 multLtCross : a * b `LT` c * d -> c `LTE` a -> b `LT` d
-multLtCross {a} {c} abcd ca = let (delta ** prf) = lteDelta ca in
-                              multLtCross'delta (lteDelta ca) abcd
+multLtCross {a} {c} abcd ca = multLtCross'delta (lteDelta ca) abcd
