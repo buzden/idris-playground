@@ -37,9 +37,9 @@ M Nat (*) where
 
 --- Usage example ---
 
-fold : {op : a -> a -> a} -> M a op => List a -> a
-fold [] = neu {a} {op}
-fold (x::xs) = x `op` fold {op} xs
+fold : (op : a -> a -> a) -> M a op => List a -> a
+fold op [] = neu {a} {op}
+fold op (x::xs) = x `op` fold op xs
 
 --- Running example ---
 
@@ -47,9 +47,9 @@ testList : List Nat
 testList = [1, 2, 3, 4]
 
 testSum : Nat
-testSum = fold {op=(+)} testList
+testSum = fold (+) testList
 -- it is 10!
 
 testMul : Nat
-testMul = fold {op=(*)} testList
+testMul = fold (*) testList
 -- it is 24!
