@@ -15,6 +15,7 @@ record X where
   z : Integer
 
 SomeX : Monad m => m X
+SomeX = pure $ MkX {x=5} {y=3} {z=10}
 
 analyzeX : Monad m => m Integer
 analyzeX = do
