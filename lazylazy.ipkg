@@ -1,0 +1,10 @@
+package lazylazy
+
+authors = "Denis Buzdalov"
+
+modules = LazyLazy
+
+depends = contrib
+
+main = LazyLazy
+executable = lazylazy
