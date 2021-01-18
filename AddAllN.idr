@@ -21,5 +21,8 @@ add {n=S k} = \n => liftUnary (n+) add
 x : Nat
 x = add 2 3 4 5
 
+x' : Nat
+x' = add (the Nat 2) (the Nat 3) (the Nat 4) (the Nat 5)
+
 y : Nat
 y = add 1 2
