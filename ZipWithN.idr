@@ -19,10 +19,14 @@ namespace FunctionBased
   sequenceFunN {n=Z}   {args=[]}    = id
   sequenceFunN {n=S k} {args=a::as} = \xs, x => sequenceFunN $ (\f => f x) <$> xs
 
+  apFunN : {n : Nat} -> {0 args : Vect n Type} -> Applicative f => f $ FunN args res -> FunN (f <$> args) (f res)
+  apFunN {n=Z}   {args=[]}    = id
+  apFunN {n=S k} {args=a::as} = \fs, fa => apFunN $ fs <*> fa
+
   public export
-  zipWithN : {n : Nat} -> {0 args : Vect n Type} -> Monad f => FunN args res -> FunN (f <$> args) (f res)
+  zipWithN : {n : Nat} -> {0 args : Vect n Type} -> Applicative m => FunN args res -> FunN (m <$> args) (m res)
   zipWithN {n=Z} {args=[]} f = pure f
-  zipWithN {n=S k} {args=a::as} f = \xs => mapFunN join $ sequenceFunN $ zipWithN <$> f <$> xs
+  zipWithN {n=S k} {args=a::as} f = \xs => apFunN $ f <$> xs
 
   constFunN : {n : Nat} -> {0 args : Vect n Type} -> r -> FunN args r
   constFunN {n=Z}   {args=[]}    = id
