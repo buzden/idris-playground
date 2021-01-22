@@ -15,12 +15,12 @@ namespace FunctionBased
   mapFunN {n=Z}   {args=[]}    f x  = f x
   mapFunN {n=S k} {args=a::as} f fs = mapFunN f . fs
 
-  sequenceFunN : {n : Nat} -> {0 args : Vect n Type} -> List $ FunN args res -> FunN args $ List res
+  sequenceFunN : {n : Nat} -> {0 args : Vect n Type} -> Functor f => f $ FunN args res -> FunN args $ f res
   sequenceFunN {n=Z}   {args=[]}    = id
   sequenceFunN {n=S k} {args=a::as} = \xs, x => sequenceFunN $ (\f => f x) <$> xs
 
   public export
-  zipWithN : {n : Nat} -> {0 args : Vect n Type} -> FunN args res -> FunN (List <$> args) (List res)
+  zipWithN : {n : Nat} -> {0 args : Vect n Type} -> Monad f => FunN args res -> FunN (f <$> args) (f res)
   zipWithN {n=Z} {args=[]} f = pure f
   zipWithN {n=S k} {args=a::as} f = \xs => mapFunN join $ sequenceFunN $ zipWithN <$> f <$> xs
 
