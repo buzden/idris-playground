@@ -30,5 +30,5 @@ namespace FunctionBased
 
   public export
   zipWithN : {n : Nat} -> {0 args : Vect n Type} -> (ZipWithable m, Applicative m) => FunN args res -> FunN (m <$> args) (m res)
-  zipWithN {n=Z} {args=[]} f = pure f
-  zipWithN {n=S k} {args=a::as} f = \xs => apFunN $ f <$> xs
+  zipWithN {n=Z}   {args=[]}    = pure
+  zipWithN {n=S k} {args=a::as} = \f, xs => apFunN $ f <$> xs
