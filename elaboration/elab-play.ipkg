@@ -1,0 +1,8 @@
+package elab-play
+
+authors    = "Denis Buzdalov"
+
+depends    = base, contrib, elab-util, sop
+
+modules = Mb
+        , Der
