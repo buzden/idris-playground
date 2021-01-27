@@ -1,5 +1,7 @@
 -- An answer to a question by Nicolas Alexander Schmidt in the idris mailing list.
 
+%default total
+
 interface Foo (p : Type -> Type) where
   bar : {a : _} -> p a => a
 
@@ -10,3 +12,12 @@ data OnlyInt : Type -> Type where
 Foo OnlyInt where
   bar {a=Int} @{NiceCase}  = 0
   bar {a=x}   @{BadCase y} = absurd y
+
+-- Why can't we remove `BadCase` and its match from `bar` implementation?
+-- Compiler claims that match in not exhaustive, however, everything works for `Nat`s:
+
+data X : Nat -> Type where
+  X10 : X 10
+
+bbar : {a : _} -> X a -> Int
+bbar {a=10} X10 = 1
