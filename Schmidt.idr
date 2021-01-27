@@ -3,15 +3,13 @@
 %default total
 
 interface Foo (p : Type -> Type) where
-  bar : {a : _} -> p a => a
+  bar : {0 a : _} -> p a => a
 
 data OnlyInt : Type -> Type where
   NiceCase : OnlyInt Int
-  BadCase  : Void -> OnlyInt x
 
 Foo OnlyInt where
-  bar {a=Int} @{NiceCase}  = 0
-  bar {a=x}   @{BadCase y} = absurd y
+  bar @{NiceCase} = 0
 
 -- Why can't we remove `BadCase` and its match from `bar` implementation?
 -- Compiler claims that match in not exhaustive, however, everything works for `Nat`s:
