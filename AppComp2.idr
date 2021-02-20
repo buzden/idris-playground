@@ -4,25 +4,31 @@ import Control.Monad.Identity
 
 -- Validated - an Either with a monoidal error --
 
+public export
 data Validated e a = Valid a | Invalid e
 
+public export
 (Eq e, Eq a) => Eq (Validated e a) where
   Valid x   == Valid y   = x == y
   Invalid e == Invalid f = e == f
   _ == _ = False
 
+export
 (Show e, Show a) => Show (Validated e a) where
   showPrec d $ Valid   x = showCon d "Valid" $ showArg x
   showPrec d $ Invalid e = showCon d "Invalid" $ showArg e
 
+public export
 Functor (Validated e) where
   map f $ Valid x   = Valid $ f x
   map _ $ Invalid e = Invalid e
 
+public export
 Bifunctor Validated where
   bimap _ s $ Valid x   = Valid   $ s x
   bimap f _ $ Invalid e = Invalid $ f e
 
+public export
 Semigroup e => Applicative (Validated e) where
   pure = Valid
   Invalid e1 <*> Invalid e2 = Invalid $ e1 <+> e2
@@ -30,6 +36,7 @@ Semigroup e => Applicative (Validated e) where
   Invalid e  <*> Valid _    = Invalid e
   Valid _    <*> Invalid e  = Invalid e
 
+public export
 Foldable (Validated e) where
   foldr op init $ Valid x   = x `op` init
   foldr _  init $ Invalid _ = init
@@ -40,13 +47,16 @@ Foldable (Validated e) where
   null $ Valid _   = False
   null $ Invalid _ = True
 
+public export
 Traversable (Validated e) where
   traverse f $ Valid x   = Valid <$> f x
   traverse _ $ Invalid e = pure $ Invalid e
 
+public export %inline
 ValidatedL : Type -> Type -> Type
 ValidatedL e a = Validated (List e) a
 
+public export %inline
 oneInvalid : e -> Applicative f => Validated (f e) a
 oneInvalid x = Invalid $ pure x
 
