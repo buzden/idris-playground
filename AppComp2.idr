@@ -28,13 +28,32 @@ Bifunctor Validated where
   bimap _ s $ Valid x   = Valid   $ s x
   bimap f _ $ Invalid e = Invalid $ f e
 
+-- Composition preserves invalidity
 public export
 Semigroup e => Applicative (Validated e) where
   pure = Valid
-  Invalid e1 <*> Invalid e2 = Invalid $ e1 <+> e2
+
   Valid f    <*> Valid x    = Valid $ f x
+  Invalid e1 <*> Invalid e2 = Invalid $ e1 <+> e2
   Invalid e  <*> Valid _    = Invalid e
   Valid _    <*> Invalid e  = Invalid e
+
+-- Composition preserves validity
+public export
+Semigroup e => Semigroup (Validated e a) where
+  l@(Valid _) <+> _           = l
+  _           <+> r@(Valid _) = r
+  Invalid e1  <+> Invalid e2  = Invalid $ e1 <+> e2
+
+public export
+Monoid e => Monoid (Validated e a) where
+  neutral = Invalid neutral
+
+-- Composition preserves validity
+public export
+Monoid e => Alternative (Validated e) where
+  empty = neutral
+  (<|>) = (<+>)
 
 public export
 Foldable (Validated e) where
