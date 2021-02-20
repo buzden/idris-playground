@@ -23,7 +23,7 @@ Bifunctor Validated where
   bimap _ s $ Valid x   = Valid   $ s x
   bimap f _ $ Invalid e = Invalid $ f e
 
-Monoid e => Applicative (Validated e) where
+Semigroup e => Applicative (Validated e) where
   pure = Valid
   Invalid e1 <*> Invalid e2 = Invalid $ e1 <+> e2
   Valid f    <*> Valid x    = Valid $ f x
