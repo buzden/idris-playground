@@ -44,22 +44,28 @@ Traversable (Validated e) where
   traverse f $ Valid x   = Valid <$> f x
   traverse _ $ Invalid e = pure $ Invalid e
 
+ValidatedL : Type -> Type -> Type
+ValidatedL e a = Validated (List e) a
+
+oneInvalid : e -> Applicative f => Validated (f e) a
+oneInvalid x = Invalid $ pure x
+
 -- Errorful monadic functions --
 
-f1 : Monad m => Int -> m $ Validated (List String) Int
-f1 5 = pure $ Valid 0
-f1 _ = pure $ Invalid ["fail 1"]
+f1 : Monad m => Int -> m $ ValidatedL String Int
+f1 5 = pure $ pure 0
+f1 _ = pure $ oneInvalid "fail 1"
 
-f2 : Monad m => Int -> m $ Validated (List String) Int
-f2 6 = pure $ Valid 0
-f2 _ = pure $ Invalid ["fail 2"]
+f2 : Monad m => Int -> m $ ValidatedL String Int
+f2 6 = pure $ pure 0
+f2 _ = pure $ oneInvalid "fail 2"
 
 -- Compositions --
 
-c1 : Monad m => m (Validated (List String) Int)
+c1 : Monad m => m (ValidatedL String Int)
 c1 = f1 1 *> f2 1
 
-c2 : Monad m => m (Validated (List String) Int)
+c2 : Monad m => m (ValidatedL String Int)
 c2 = (f1 1 *> f2 1) @{Applicative.Compose}
 
 -- These checks are meant to be true --
