@@ -1,0 +1,71 @@
+import Control.Monad.Identity
+
+%default total
+
+-- Validated - an Either with a monoidal error --
+
+data Validated e a = Valid a | Invalid e
+
+(Eq e, Eq a) => Eq (Validated e a) where
+  Valid x   == Valid y   = x == y
+  Invalid e == Invalid f = e == f
+  _ == _ = False
+
+(Show e, Show a) => Show (Validated e a) where
+  showPrec d $ Valid   x = showCon d "Valid" $ showArg x
+  showPrec d $ Invalid e = showCon d "Invalid" $ showArg e
+
+Functor (Validated e) where
+  map f $ Valid x   = Valid $ f x
+  map _ $ Invalid e = Invalid e
+
+Bifunctor Validated where
+  bimap _ s $ Valid x   = Valid   $ s x
+  bimap f _ $ Invalid e = Invalid $ f e
+
+Monoid e => Applicative (Validated e) where
+  pure = Valid
+  Invalid e1 <*> Invalid e2 = Invalid $ e1 <+> e2
+  Valid f    <*> Valid x    = Valid $ f x
+  Invalid e  <*> Valid _    = Invalid e
+  Valid _    <*> Invalid e  = Invalid e
+
+Foldable (Validated e) where
+  foldr op init $ Valid x   = x `op` init
+  foldr _  init $ Invalid _ = init
+
+  foldl op init $ Valid x   = init `op` x
+  foldl _  init $ Invalid _ = init
+
+  null $ Valid _   = False
+  null $ Invalid _ = True
+
+Traversable (Validated e) where
+  traverse f $ Valid x   = Valid <$> f x
+  traverse _ $ Invalid e = pure $ Invalid e
+
+-- Errorful monadic functions --
+
+f1 : Monad m => Int -> m $ Validated (List String) Int
+f1 5 = pure $ Valid 0
+f1 _ = pure $ Invalid ["fail 1"]
+
+f2 : Monad m => Int -> m $ Validated (List String) Int
+f2 6 = pure $ Valid 0
+f2 _ = pure $ Invalid ["fail 2"]
+
+-- Compositions --
+
+c1 : Monad m => m (Validated (List String) Int)
+c1 = f1 1 *> f2 1
+
+c2 : Monad m => m (Validated (List String) Int)
+c2 = (f1 1 *> f2 1) @{Applicative.Compose}
+
+-- These checks are meant to be true --
+
+r1 : Bool
+r1 = runIdentity c1 == Invalid ["fail 2"]
+
+r2 : Bool
+r2 = runIdentity c2 == Invalid ["fail 1", "fail 2"]
