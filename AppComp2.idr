@@ -79,6 +79,21 @@ public export %inline
 oneInvalid : e -> Applicative f => Validated (f e) a
 oneInvalid x = Invalid $ pure x
 
+public export %inline
+fromEither : Either e a -> Validated e a
+fromEither $ Right x = Valid x
+fromEither $ Left  e = Invalid e
+
+public export %inline
+fromEitherL : Either e a -> ValidatedL e a
+fromEitherL $ Right x = Valid x
+fromEitherL $ Left  e = oneInvalid e
+
+public export %inline
+toEither : Validated e a -> Either e a
+toEither $ Valid   x = Right x
+toEither $ Invalid e = Left e
+
 -- Errorful monadic functions --
 
 f1 : Monad m => Int -> m $ ValidatedL String Int
