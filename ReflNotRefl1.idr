@@ -3,8 +3,8 @@ module ReflNotRefl1
 import Data.Fin
 import Data.Vect
 
-import Decidable.Decidable
-import Decidable.Equality
+import public Decidable.Decidable
+import public Decidable.Equality
 
 public export
 data X : Nat -> Type where
