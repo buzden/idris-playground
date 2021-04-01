@@ -100,7 +100,7 @@ t' : Iterable'' a (StateT (LeftToIterate T.Tree) (ReaderT (OriginalValues T.Tree
 t' = runIterableT (T.treesOfSize 4) $ takeSome decoratedTreesIterator''
 
 xx : Iterable'' a m => Iterable'' a $ StateT (LeftToIterate T.Tree) (ReaderT (OriginalValues T.Tree) m)
-xx = (State.Trans, let %hint x : MonadReader (OriginalValues a) (ReaderT (OriginalValues Tree) m); x = Reader.Trans in Reader.Trans)
+xx = (State.Trans, Reader.Trans @{Reader.Trans})
 
 decoratedTreesExample'' : List $ Tree Int
 decoratedTreesExample'' =
