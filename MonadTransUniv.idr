@@ -1,4 +1,6 @@
-import MonadFunctor
+module MonadTransUniv
+
+import public MonadFunctor
 
 import Control.Monad.Error.Interface
 import Control.Monad.Reader
