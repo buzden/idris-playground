@@ -108,3 +108,6 @@ decoratedTreesExample'' =
 
     xx : Iterable'' a m => Iterable'' a $ StateT (LeftToIterate T.Tree) (ReaderT (OriginalValues T.Tree) m)
     xx = (State.Trans, Reader.Trans @{Reader.Trans})
+
+dtiMain : IO ()
+dtiMain = traverse_ putStrLn $ map show decoratedTreesExample''
