@@ -9,15 +9,15 @@ import Control.Monad.Writer
 
 public export
 interface MonadFunctor (0 t : (Type -> Type) -> Type -> Type) where
-  liftMap : (forall a. m a -> n a) -> t m a -> t n a
+  liftMap : Monad m => (m a -> m b) -> t m a -> t m b
 
 public export
 MonadFunctor (EitherT e) where
-  liftMap f (MkEitherT x) = MkEitherT $ f x
+  liftMap f (MkEitherT x) = MkEitherT $ x >>= either (pure . Left) (map Right . f . pure)
 
 public export
 MonadFunctor MaybeT where
-  liftMap f (MkMaybeT x) = MkMaybeT $ f x
+  liftMap f (MkMaybeT x) = MkMaybeT $ x >>= maybe (pure Nothing) (map Just . f . pure)
 
 public export
 MonadFunctor (ReaderT r) where
@@ -25,12 +25,12 @@ MonadFunctor (ReaderT r) where
 
 public export
 MonadFunctor (RWST r w s) where
-  liftMap f (MkRWST rws) = MkRWST $ (f .) .: rws
+  liftMap f (MkRWST rws) = MkRWST $ \r, w, s => rws r w s >>= \(x, ws) => (, ws) <$> f (pure x)
 
 public export
 MonadFunctor (StateT s) where
-  liftMap f (ST rs) = ST $ f . rs
+  liftMap f (ST rs) = ST \s => rs s >>= \(r, x) => (r, ) <$> f (pure x)
 
 public export
 MonadFunctor (WriterT w) where
-  liftMap f (MkWriterT w) = MkWriterT $ f . w
+  liftMap f (MkWriterT w) = MkWriterT \u => w u >>= \(x, v) => (, v) <$> f (pure x)
