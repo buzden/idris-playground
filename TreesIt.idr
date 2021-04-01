@@ -96,15 +96,15 @@ decoratedTreesIterator'' = next'' >>= decorateTree''
 takeSome : Monad m => m a -> m $ List a
 takeSome = sequence . replicate 6
 
-t' : Iterable'' a (StateT (LeftToIterate T.Tree) (ReaderT (OriginalValues T.Tree) m)) => Monad m => m $ List $ Tree a
-t' = runIterableT (T.treesOfSize 4) $ takeSome decoratedTreesIterator''
-
-xx : Iterable'' a m => Iterable'' a $ StateT (LeftToIterate T.Tree) (ReaderT (OriginalValues T.Tree) m)
-xx = (State.Trans, Reader.Trans @{Reader.Trans})
-
 decoratedTreesExample'' : List $ Tree Int
 decoratedTreesExample'' =
   runIdentity $
     runIterableT {s=Int} [1..5] $ t' @{xx}
     --  runIterableT (T.treesOfSize 4) $
     --    takeSome decoratedTreesIterator''
+  where
+    t' : Iterable'' a (StateT (LeftToIterate T.Tree) (ReaderT (OriginalValues T.Tree) m)) => Monad m => m $ List $ Tree a
+    t' = runIterableT (T.treesOfSize 4) $ takeSome decoratedTreesIterator''
+
+    xx : Iterable'' a m => Iterable'' a $ StateT (LeftToIterate T.Tree) (ReaderT (OriginalValues T.Tree) m)
+    xx = (State.Trans, Reader.Trans @{Reader.Trans})
