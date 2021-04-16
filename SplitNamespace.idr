@@ -1,15 +1,12 @@
 namespace X
 
-  f : Int -> Int
-
   export
-  f_pub : Int -> Int
-  f_pub = f
+  f : Int -> Int
 
 namespace Y
 
   g : Int -> Int -> Int
-  g x y = x + f_pub g
+  g x y = x + f g
 
 namespace X
 
