@@ -9,7 +9,7 @@ namespace X
 namespace Y
 
   g : Int -> Int -> Int
-  g x y = x + f_pub y
+  g x y = x + f_pub g
 
 namespace X
 
