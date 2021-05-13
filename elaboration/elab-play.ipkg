@@ -2,7 +2,8 @@ package elab-play
 
 authors    = "Denis Buzdalov"
 
-depends    = base, contrib, elab-util, sop
+depends    = base, contrib, elab-util
 
 modules = Mb
         , Der
+        , InfoWithImplicit
