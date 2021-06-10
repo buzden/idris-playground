@@ -11,7 +11,8 @@ interface Equ ty where
   0 symmetry     : {0 x, y : ty} -> (0 _ : x =~= y) -> y =~= x
   0 transitivity : {0 x, y, z : ty} -> (0 _ : x =~= y) -> (0 _ : y =~= z) -> x =~= z
 
-  --0 congruent : {0 b : Type} -> (eb : Equ b) => {0 f : ty -> b} -> {0 x, y : ty} -> (0 _ : x =~= y) -> f x =~= f y
+interface Equ ty => EquProp ty where
+  0 equIsProp : (=~=) {ty} = Equal
 
 interface Equ ty => Cong ty where -- couldn't made it a part of the `Equ` interface...
   0 congruence : Equ tu => (0 f : ty -> tu) -> {0 x, y : ty} -> (0 _ : x =~= y) -> f x =~= f y
@@ -27,6 +28,9 @@ Equ Nat where
   reflexivity  = Refl
   symmetry     = sym
   transitivity = trans
+
+EquProp Nat where
+  equIsProp = Refl
 
 Cong Nat where
   congruence _ Refl = reflexivity
