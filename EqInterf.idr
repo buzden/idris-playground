@@ -4,6 +4,10 @@ import Data.Nat
 
 infix 6 =~=
 
+--------------------------------------------------
+--- Interfaces and general functions over them ---
+--------------------------------------------------
+
 interface Equ ty where
   data (=~=) : ty -> ty -> Type
 
@@ -27,6 +31,10 @@ interface Equ ty => EquProp ty where
 
 interface Equ t => Equ u => Inj t u (0 f : t -> u) where
   0 injectivity : {0 x, y : t} -> (0 _ : f x =~= f y) -> x =~= y
+
+---------------------------------------------
+--- Interfaces' implementations for `Nat` ---
+---------------------------------------------
 
 Equ Nat where
   (=~=) = Equal
@@ -55,6 +63,10 @@ Inj Nat _ (n+) where
 
 Inj Nat _ (+n) where
   injectivity eq = injPlusL {n} rewrite plusCommutative n x in rewrite plusCommutative n y in eq
+
+----------------------------------------------------------
+--- Equality for functions as functional extensinality ---
+----------------------------------------------------------
 
 [WeakFunext] Equ b => Equ (a -> b) where
   f =~= g = (x : a) -> f x =~= g x
