@@ -40,8 +40,8 @@ Cong Nat where
   symmetry p       = \x => symmetry $ p x
   transitivity p q = \x => transitivity (p x) (q x)
 
---[WeakFunextCong] Cong (a -> b) using WeakFunext where
---  congruence f xy = \x => congruence f $ xy x
+[WeakFunextCong] Equ b => Cong (a -> b) using WeakFunext where
+  congruence {x=f} {y=g} h xy = ?foo
 
 [StrongFunext] Cong a => Equ b => Equ (a -> b) where
   f =~= g = (x, y : a) -> x =~= y -> f x =~= g y
@@ -52,5 +52,5 @@ Cong Nat where
   symmetry {x=f} {y=g} fg = \x, y, xy => symmetry $ fg y x $ symmetry xy
   transitivity {x=f} {y=g} {z=h} fg gh = \x, y, xy => fg x y xy `transitivity` gh y y reflexivity
 
---[StrongFunextCong] Cong (a -> b) using StrongFunext where
---  congruence {x=f} {y=g} h xy = \u, v, uv => ?foo
+[StrongFunextCong] Cong a => Equ b => Cong (a -> b) using StrongFunext where
+  congruence {x=f} {y=g} h xy = ?foo0 -- \u, v, uv => ?foo
