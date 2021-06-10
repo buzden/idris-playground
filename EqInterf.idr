@@ -78,7 +78,7 @@ Inj Nat _ (+n) where
   transitivity p q x = transitivity (p x) (q x)
 
 [WeakFunextTransp] Equ b => Transp (a -> b) using WeakFunext where
-  transport {x=f} {y=g} pr fg p = ?foo_transport
+  transport {x=f} {y=g} pr fg p = ?foo_transport -- impossible since implies actual functional extensionality
 
 [StrongFunext] Transp a => Equ b => Equ (a -> b) where
   f =~= g = (x, y : a) -> x =~= y -> f x =~= g y
@@ -90,4 +90,4 @@ Inj Nat _ (+n) where
   transitivity {x=f} {y=g} {z=h} fg gh = \x, y, xy => fg x y xy `transitivity` gh y y reflexivity
 
 [StrongFunextTransp] Transp a => Equ b => Transp (a -> b) using StrongFunext where
-  transport {x=f} {y=g} pr fg p = ?foo0
+  transport {x=f} {y=g} pr fg p = ?foo0 -- impossible since implies actual functional extensionality
