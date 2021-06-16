@@ -20,6 +20,8 @@ interface
   --GenFunctor objC objD (0 arrC : objC -> objC -> Type) (0 arrD : objD -> objD -> Type) (0 f : objC -> objD) | f where
     gmap : {0 a, b : objC} -> arrC a b -> arrD (f a) (f b)
 
+  -- Didn't manage to get rid of explicit `objC`, `objD`, `arrC` and `arrD` parameters.
+
 -----------------------------
 --- Auxiliary definitions ---
 -----------------------------
