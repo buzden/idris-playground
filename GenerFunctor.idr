@@ -4,6 +4,9 @@ module GenerFunctor
 
 import Control.Category
 
+import Control.Monad.Reader
+import Control.Monad.Trans
+
 %default total
 
 ------------------
@@ -14,6 +17,7 @@ interface
   Category {obj=objC} arrC =>
   Category {obj=objD} arrD =>
   GenFunctor objC objD arrC arrD f | f where
+  --GenFunctor objC objD (0 arrC : objC -> objC -> Type) (0 arrD : objD -> objD -> Type) (0 f : objC -> objD) | f where
     gmap : {0 a, b : objC} -> arrC a b -> arrD (f a) (f b)
 
 -----------------------------
@@ -66,3 +70,16 @@ PrevGenFunctor n m => GenFunctor Type Type (WrFun n) Fun m where
 
 PrevGenFunctor n m => GenFunctor Type Type (WrFun n) (WrFun m) Prelude.id where
   gmap = pgmap
+
+-------------
+--- Usage ---
+-------------
+
+-- All those `gmap {f=...}` work only when we have `GenFunctor ... f | f where` functional dependency
+
+ns2is : List Nat -> List Int
+ns2is = gmap {f=List} cast
+
+[Trans] MonadReader r m => MonadTrans t => GenFunctor Type Type (WrFun m) Fun (t m) => Monad (t m) => MonadReader r (t m) where
+  ask   = lift ask
+  local = gmap {f=t m} . local
