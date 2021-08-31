@@ -31,6 +31,9 @@ namespace OneParameter
 
     %runElab extract X
 
+    v : Unit
+    v = %runElab extract X
+
     u : Unit
     u = extract' X
 
@@ -40,6 +43,9 @@ namespace OneParameter
     -- When there are not so many stuff inside the dpair, all is okay being inlined
 
     %runElab extract (n : Nat ** Y n)
+
+    v : Unit
+    v = %runElab extract (n : Nat ** Y n)
 
     u : Unit
     u = extract' (n : Nat ** Y n)
@@ -64,6 +70,9 @@ namespace TwoParameters
 
     %runElab extract X
 
+    v : Unit
+    v = %runElab extract X
+
     u : Unit
     u = extract' X
 
@@ -75,6 +84,9 @@ namespace TwoParameters
 
 
     %runElab extract (n : Nat ** x : Type ** Y n x)
+
+    v : Unit
+    v = %runElab extract (n : Nat ** x : Type ** Y n x)
 
     u : Unit
     u = extract' (n : Nat ** x : Type ** Y n x)
