@@ -3,6 +3,8 @@ module Its
 import Control.Monad.Maybe
 import Control.Monad.State
 
+import Data.Maybe
+
 %default total
 
 --- Staty iterator ---
@@ -26,8 +28,8 @@ itX ma mb = [| MkX ma ma mb mb |]
 
 --- Running harness ---
 
-xsc : (spending : List a) -> (cartesian : List b) -> Maybe $ List $ X a b
-xsc as bs = runIdentity $ runMaybeT $ evalStateT as $ sequence $
+xsc : (spending : List a) -> (cartesian : List b) -> List $ X a b
+xsc as bs = fromMaybe [] $ runIdentity $ runMaybeT $ evalStateT as $ sequence $
               itX (pure cr) (pure <$> bs)
                 @{Applicative.Compose} {m = List .: StateT _ . _ $ Identity}
 
@@ -40,7 +42,4 @@ theStrs : List String
 theStrs = ["a", "b", "c"]
 
 main : IO ()
-main = do
-  let Just xns = xsc theNats theStrs
-    | Nothing => putStrLn "Nope"
-  for_ xns $ putStrLn . ("\n" ++) . show
+main = for_ (xsc theNats theStrs) $ putStrLn . ("\n" ++) . show
