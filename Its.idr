@@ -17,14 +17,23 @@ cr = do
 
 --- Data structure ---
 
-data X a b = MkX a a b b
+data Y a b = MkY a b
+
+data X a b = MkX a a (Y a b) (Y a b)
+
+Show a => Show b => Show (Y a b) where
+  show (MkY a b) = "MkY \{show a} \{show b}"
 
 Show a => Show b => Show (X a b) where
-  show (MkX a1 a2 b1 b2) = "MkX \{show a1} \{show a2} \{show b1} \{show b2}"
+  show (MkX a1 a2 b1 b2) = "MkX \{show a1} \{show a2} (\{show b1}) (\{show b2})"
 
 -- Iterator with external subiterators ---
+
+itY : Applicative m => m a -> m b -> m (Y a b)
+itY ma mb = [| MkY ma mb |]
+
 itX : Applicative m => m a -> m b -> m (X a b)
-itX ma mb = [| MkX ma ma mb mb |]
+itX ma mb = [| MkX ma ma (itY ma mb) (itY ma mb) |]
 
 --- Running harness ---
 
