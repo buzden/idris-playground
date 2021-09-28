@@ -51,11 +51,16 @@ xsc as bs = fromMaybe [] $ evalStateT as $ runPartialCartesian $
 
 --- Example run ---
 
-theNats : List Nat
-theNats = [100 .. 130] -- 999]
+aLotOfNats : List Nat
+aLotOfNats = [100 .. 999]
+
+aFewNats : List Nat
+aFewNats = [100 .. 130]
 
 theStrs : List String
 theStrs = ["a", "b", "c"]
 
 main : IO ()
-main = for_ (xsc theNats theStrs) $ putStrLn . ("\n" ++) . show
+main = for_ [aFewNats, aLotOfNats] $ \nats => do
+  for_ (xsc nats theStrs) $ putStrLn . ("\n" ++) . show
+  putStrLn "\n^^^^^^^^^"
