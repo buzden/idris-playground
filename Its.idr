@@ -36,14 +36,24 @@ itX ma mb = [| MkX ma ma (itY ma mb) (itY ma mb) |]
 
 --- Running harness ---
 
+-- Like `sequence` but produces the longest possible non-failing sequence
+runPartialCartesian : List (StateT s Maybe a) -> StateT s Maybe (List a)
+runPartialCartesian [] = pure []
+runPartialCartesian (curr::rest) = ST $ \s => do
+  let Just (s, a) = runStateT s curr
+    | Nothing => runStateT s $ runPartialCartesian rest -- or just `Nothing` for fail-fast semantics
+  let Just (s, as) = runStateT s $ runPartialCartesian rest
+    | Nothing => Just (s, [a])
+  Just (s, a::as)
+
 xsc : (spending : List a) -> (cartesian : List b) -> List $ X a b
-xsc as bs = fromMaybe [] $ evalStateT as $ sequence $
+xsc as bs = fromMaybe [] $ evalStateT as $ runPartialCartesian $
               itX (pure cr) (pure <$> bs) @{Applicative.Compose}
 
 --- Example run ---
 
 theNats : List Nat
-theNats = [100 .. 999]
+theNats = [100 .. 110] -- 999]
 
 theStrs : List String
 theStrs = ["a", "b", "c"]
