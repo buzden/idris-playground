@@ -34,6 +34,34 @@ itY ma mb = [| MkY ma mb |]
 itX : Applicative m => m a -> m b -> m (X a b)
 itX ma mb = [| MkX ma ma (itY ma mb) (itY ma mb) |]
 
+--- Special data for special needs (tracking) ---
+
+-- Not really nice that `MkTrackFull Nothing True` exists.
+record TrackFull a where
+  constructor MkTrackFull
+  cont : Maybe a
+  full : Bool
+
+Functor TrackFull where
+  map f (MkTrackFull m e) = MkTrackFull (map f m) e
+
+Applicative TrackFull where
+  pure x = MkTrackFull (pure x) True
+  MkTrackFull f bl <*> MkTrackFull x br = MkTrackFull (f <*> x) (bl && br)
+
+Alternative TrackFull where
+  empty = MkTrackFull empty False
+  x@(MkTrackFull (Just _) _) <|> _               = x
+  MkTrackFull Nothing _      <|> MkTrackFull y _ = MkTrackFull y False
+
+Monad TrackFull where
+  MkTrackFull Nothing  _  >>= _ = MkTrackFull Nothing False
+  MkTrackFull (Just x) bl >>= f = let MkTrackFull y br = f x in MkTrackFull y $ bl && br
+
+-- like `fromMaybe` but for `TrackFull`
+fromTrackEnd : Lazy a -> TrackFull a -> (a, Bool)
+fromTrackEnd x (MkTrackFull cont full) = (fromMaybe x cont, full)
+
 --- Running harness ---
 
 -- Like specialised `sequence` but produces the longest possible non-failing sequence
@@ -45,8 +73,8 @@ runPartialCartesian (curr::rest) = ST $ \s => do
   (s, r) <- runStateT s (runPartialCartesian rest) <|> pure (s, [])
   pure (s, l ++ r)
 
-xsc : (spending : List a) -> (cartesian : List b) -> List $ X a b
-xsc as bs = fromMaybe [] $ evalStateT as $ runPartialCartesian $
+xsc : (spending : List a) -> (cartesian : List b) -> (List $ X a b, Bool)
+xsc as bs = fromTrackEnd [] $ evalStateT as $ runPartialCartesian $
               itX (pure cr) (pure <$> bs) @{Applicative.Compose}
 
 --- Example run ---
@@ -62,5 +90,6 @@ theStrs = ["a", "b", "c"]
 
 main : IO ()
 main = for_ [aFewNats, aLotOfNats] $ \nats => do
-  for_ (xsc nats theStrs) $ putStrLn . ("\n" ++) . show
-  putStrLn "\n^^^^^^^^^"
+  let (xs, full) = xsc nats theStrs
+  for_ xs $ putStrLn . ("\n" ++) . show
+  putStrLn "\n^^^^^^^^^ cartesian iteration was\{if full then "" else "n't"} full"
