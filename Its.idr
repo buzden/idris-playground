@@ -36,31 +36,26 @@ itX ma mb = [| MkX ma ma (itY ma mb) (itY ma mb) |]
 
 --- Special data for special needs (tracking) ---
 
--- Not really nice that `MkTrackFull Nothing True` exists.
-record TrackFull a where
-  constructor MkTrackFull
-  cont : Maybe a
-  full : Bool
+data TrackFull a = MkTrackFull (Maybe (a, Bool))
 
 Functor TrackFull where
-  map f (MkTrackFull m e) = MkTrackFull (map f m) e
+  map f (MkTrackFull m) = MkTrackFull $ mapFst f <$> m
 
 Applicative TrackFull where
-  pure x = MkTrackFull (pure x) True
-  MkTrackFull f bl <*> MkTrackFull x br = MkTrackFull (f <*> x) (bl && br)
+  pure = MkTrackFull . pure . (,True)
+  MkTrackFull f <*> MkTrackFull x = MkTrackFull $ (\(f, bl) => bimap f (bl &&)) <$> f <*> x
 
 Alternative TrackFull where
-  empty = MkTrackFull empty False
-  x@(MkTrackFull (Just _) _) <|> _               = x
-  MkTrackFull Nothing _      <|> MkTrackFull y _ = MkTrackFull y False
+  empty = MkTrackFull empty
+  x@(MkTrackFull (Just _)) <|> _             = x
+  MkTrackFull Nothing      <|> MkTrackFull y = MkTrackFull $ y <&> mapSnd (const False)
 
 Monad TrackFull where
-  MkTrackFull Nothing  _  >>= _ = MkTrackFull Nothing False
-  MkTrackFull (Just x) bl >>= f = let MkTrackFull y br = f x in MkTrackFull y $ bl && br
+  MkTrackFull m >>= f = MkTrackFull $ m >>= \(a, bl) => let MkTrackFull n = f a in mapSnd (bl &&) <$> n
 
 -- like `fromMaybe` but for `TrackFull`
 fromTrackEnd : Lazy a -> TrackFull a -> (a, Bool)
-fromTrackEnd x (MkTrackFull cont full) = (fromMaybe x cont, full)
+fromTrackEnd x (MkTrackFull cont) = fromMaybe (x, False) cont
 
 --- Running harness ---
 
