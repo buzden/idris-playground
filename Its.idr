@@ -1,9 +1,6 @@
 module Its
 
-import Control.Monad.Maybe
 import Control.Monad.State
-
-import Data.Maybe
 
 %default total
 
@@ -38,9 +35,8 @@ itX ma mb = [| MkX ma ma (itY ma mb) (itY ma mb) |]
 --- Running harness ---
 
 xsc : (spending : List a) -> (cartesian : List b) -> List $ X a b
-xsc as bs = fromMaybe [] $ runIdentity $ runMaybeT $ evalStateT as $ sequence $
-              itX (pure cr) (pure <$> bs)
-                @{Applicative.Compose} {m = List .: StateT _ . _ $ Identity}
+xsc as bs = join $ evalStateT as $ sequence $
+              itX (pure cr) (pure <$> bs) @{Applicative.Compose}
 
 --- Example run ---
 
