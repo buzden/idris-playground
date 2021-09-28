@@ -39,7 +39,7 @@ itX ma mb = [| MkX ma ma (itY ma mb) (itY ma mb) |]
 -- Like specialised `sequence` but produces the longest possible non-failing sequence
 -- using recovering with `Alternative`
 runPartialCartesian : Monad m => Alternative m => List (StateT s m a) -> StateT s m (List a)
-runPartialCartesian [] = pure []
+runPartialCartesian []           = pure []
 runPartialCartesian (curr::rest) = ST $ \s => do
   (s, l) <- map pure <$> runStateT s curr          <|> pure (s, [])
   (s, r) <- runStateT s (runPartialCartesian rest) <|> pure (s, [])
@@ -52,7 +52,7 @@ xsc as bs = fromMaybe [] $ evalStateT as $ runPartialCartesian $
 --- Example run ---
 
 theNats : List Nat
-theNats = [100 .. 110] -- 999]
+theNats = [100 .. 130] -- 999]
 
 theStrs : List String
 theStrs = ["a", "b", "c"]
