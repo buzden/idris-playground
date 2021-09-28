@@ -36,15 +36,14 @@ itX ma mb = [| MkX ma ma (itY ma mb) (itY ma mb) |]
 
 --- Running harness ---
 
--- Like `sequence` but produces the longest possible non-failing sequence
-runPartialCartesian : List (StateT s Maybe a) -> StateT s Maybe (List a)
+-- Like specialised `sequence` but produces the longest possible non-failing sequence
+-- using recovering with `Alternative`
+runPartialCartesian : Monad m => Alternative m => List (StateT s m a) -> StateT s m (List a)
 runPartialCartesian [] = pure []
 runPartialCartesian (curr::rest) = ST $ \s => do
-  let Just (s, a) = runStateT s curr
-    | Nothing => runStateT s $ runPartialCartesian rest -- or just `Nothing` for fail-fast semantics
-  let Just (s, as) = runStateT s $ runPartialCartesian rest
-    | Nothing => Just (s, [a])
-  Just (s, a::as)
+  (s, l) <- map pure <$> runStateT s curr          <|> pure (s, [])
+  (s, r) <- runStateT s (runPartialCartesian rest) <|> pure (s, [])
+  pure (s, l ++ r)
 
 xsc : (spending : List a) -> (cartesian : List b) -> List $ X a b
 xsc as bs = fromMaybe [] $ evalStateT as $ runPartialCartesian $
