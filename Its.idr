@@ -2,6 +2,8 @@ module Its
 
 import Control.Monad.State
 
+import Data.Maybe
+
 %default total
 
 --- Staty iterator ---
@@ -35,7 +37,7 @@ itX ma mb = [| MkX ma ma (itY ma mb) (itY ma mb) |]
 --- Running harness ---
 
 xsc : (spending : List a) -> (cartesian : List b) -> List $ X a b
-xsc as bs = join $ evalStateT as $ sequence $
+xsc as bs = fromMaybe [] $ evalStateT as $ sequence $
               itX (pure cr) (pure <$> bs) @{Applicative.Compose}
 
 --- Example run ---
