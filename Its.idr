@@ -121,12 +121,9 @@ namespace Cycling
     show SomeUncycled = "SomeUncycled"
     show AllCycled = "AllCycled"
 
-  interface Monad m => CycleReporting m where
-    cycleHappened : m ()
-
   covering
-  cycleReloaded : Alternative m => MonadState s m => CycleReporting m => s -> m a -> m a
-  cycleReloaded s act = act <|> put s *> cycleHappened *> cycleReloaded s act
+  cycleReloaded : Alternative m => MonadState s m => s -> m a -> m a
+  cycleReloaded s act = act <|> put s *> cycleReloaded s act
 
   --- Cycling tracking monad ---
 
@@ -152,14 +149,11 @@ namespace Cycling
 
   Monad m => Alternative m => Alternative (CycleTrackingStateT s m) where
     empty = MkCycTr empty
-    MkCycTr l <|> r = MkCycTr $ l <|> unCycTr r
+    MkCycTr l <|> r = MkCycTr $ l <|> modify (const AllCycled) *> unCycTr r
 
   Monad m => MonadState s (CycleTrackingStateT s m) where
     get = MkCycTr get
     put = MkCycTr . put
-
-  Monad m => CycleReporting (CycleTrackingStateT s m) where
-    cycleHappened = MkCycTr $ modify $ const AllCycled
 
   Monad m => MonadState l (CycleTrackingStateT (l, r) m) where
     get = Builtin.fst <$> get
