@@ -111,49 +111,49 @@ namespace Cycling
 
   --- Cycling any stateful monad using `Alternative` recovering ---
 
+  data Cycled = Neutral | AllOriginal | SomeCycled | AllCycled
+
+  Semigroup Cycled where
+    l <+> Neutral = l
+    Neutral <+> r = r
+
+    AllOriginal <+> AllOriginal = AllOriginal
+    AllOriginal <+> SomeCycled  = SomeCycled
+    AllOriginal <+> AllCycled   = SomeCycled
+
+    SomeCycled <+> _ = SomeCycled
+
+    AllCycled <+> AllOriginal = SomeCycled
+    AllCycled <+> SomeCycled  = SomeCycled
+    AllCycled <+> AllCycled   = AllCycled
+
+  Monoid Cycled where
+    neutral = Neutral
+
+  Show Cycled where
+    show Neutral     = "Neutral"
+    show AllOriginal = "AllOriginal"
+    show SomeCycled  = "SomeCycled"
+    show AllCycled   = "AllCycled"
+
   covering
-  cycleReloaded : Alternative m => MonadState s m => s -> m a -> m a
-  cycleReloaded s act = act <|> put s *> cycleReloaded s act
-
-  --- Special monad for tracking Alternative's `empty` per value ---
-
-  -- Boolean flag means "all were `empty`"
-  data TrackPer : (Type -> Type) -> Type -> Type where
-    MkTrackPer : StateT Bool m a -> TrackPer m a
-
-  unTrackPer : TrackPer m a -> StateT Bool m a
-  unTrackPer $ MkTrackPer x = x
-
-  Monad m => Functor (TrackPer m) where
-    map f (MkTrackPer m) = MkTrackPer $ f <$> m
-
-  Monad m => Applicative (TrackPer m) where
-    pure = MkTrackPer . pure
-    MkTrackPer f <*> MkTrackPer x = MkTrackPer $ f <*> x
-
-  Alternative m => Monad m => Alternative (TrackPer m) where
-    empty = MkTrackPer empty
-    MkTrackPer l <|> r = MkTrackPer $ l <|> put True *> unTrackPer r
-
-  Monad m => Monad (TrackPer m) where
-    MkTrackPer m >>= f = MkTrackPer $ m >>= unTrackPer . f
-
---  runTrackPer : Functor m => TrackPer m a -> m (a, Bool)
---  runTrackPer = map (\(a, b) => (b, a)) . runStateT False . unTrackPer
+  cycleReloaded : Alternative m => MonadState s m => MonadWriter Cycled m => s -> m a -> m a
+  cycleReloaded s act = doCycle AllOriginal where
+    doCycle : Cycled -> m a
+    doCycle c = tell c *> act
+            <|> put s *> doCycle AllCycled
 
   --- Running harness ---
 
-  -- failfast like `sequence`, unlike `runCartesianPartial`
-  runPerTracked : Monad m => List (StateT s (TrackPer m) a) -> StateT s m $ List (a, Bool)
-  runPerTracked = runPerTracked' False where
-    runPerTracked' : (trackPerState : Bool) -> List (StateT s (TrackPer m) a) -> StateT s m $ List (a, Bool)
-    runPerTracked' _  []      = pure []
-    runPerTracked' tr (x::xs) = ST $ \s => do
-      (tr, s, a) <- runStateT tr $ unTrackPer $ runStateT s x
-      (map . map) ((a, tr)::) $ runStateT s $ runPerTracked' tr xs
+  runPerTracked : Alternative m => Monad m => List (StateT s (WriterT Cycled m) a) -> StateT s m $ List (a, Cycled)
+  runPerTracked []           = pure []
+  runPerTracked (curr::rest) = ST $ \s => do
+    ((s, l), cycL) <- runWriterT $ map pure <$> runStateT s curr <|> pure (s, [])
+    (s, r) <- runStateT s (runPerTracked rest) <|> pure (s, [])
+    pure (s, map (,cycL) l ++ r)
 
   covering
-  xcsc : (spending1 : List a) -> (cartesian : List b) -> (spending2 : List c) -> List $ (X a b c, Bool)
+  xcsc : (spending1 : List a) -> (cartesian : List b) -> (spending2 : List c) -> List $ (X a b c, Cycled)
   xcsc as bs cs = fromMaybe [] $ evalStateT (as, cs) $ runPerTracked $
                     itX (pure $ cycleReloaded as cr) (pure <$> bs) (pure $ cycleReloaded cs cr) @{Applicative.Compose}
 
