@@ -111,37 +111,26 @@ namespace Cycling
 
   --- Cycling any stateful monad using `Alternative` recovering ---
 
-  data Cycled = Neutral | AllOriginal | SomeCycled | AllCycled
+  record Cycled where
+    constructor Cyc
+    original : Nat
+    cycled : Nat
 
   Semigroup Cycled where
-    l <+> Neutral = l
-    Neutral <+> r = r
-
-    AllOriginal <+> AllOriginal = AllOriginal
-    AllOriginal <+> SomeCycled  = SomeCycled
-    AllOriginal <+> AllCycled   = SomeCycled
-
-    SomeCycled <+> _ = SomeCycled
-
-    AllCycled <+> AllOriginal = SomeCycled
-    AllCycled <+> SomeCycled  = SomeCycled
-    AllCycled <+> AllCycled   = AllCycled
+    Cyc lo lc <+> Cyc ro rc = Cyc (lo + ro) (lc + rc)
 
   Monoid Cycled where
-    neutral = Neutral
+    neutral = Cyc 0 0
 
   Show Cycled where
-    show Neutral     = "Neutral"
-    show AllOriginal = "AllOriginal"
-    show SomeCycled  = "SomeCycled"
-    show AllCycled   = "AllCycled"
+    show $ Cyc o c = "or: \{show o}, cyc: \{show c}"
 
   covering
   cycleReloaded : Alternative m => MonadState s m => MonadWriter Cycled m => s -> m a -> m a
-  cycleReloaded s act = doCycle AllOriginal where
+  cycleReloaded s act = doCycle (Cyc 1 0) where
     doCycle : Cycled -> m a
     doCycle c = tell c *> act
-            <|> put s *> doCycle AllCycled
+            <|> put s *> doCycle (Cyc 0 1)
 
   --- Running harness ---
 
