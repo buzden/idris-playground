@@ -153,15 +153,15 @@ namespace Cycling
       (map . map) ((a, tr)::) $ runStateT s $ runPerTracked' tr xs
 
   covering
-  xcsc : (spending : List a) -> (cartesian : List b) -> List $ (X a b, Bool)
-  xcsc as bs = fromMaybe [] $ evalStateT as $ runPerTracked $
-                 itX (pure $ cycleReloaded as cr) (pure <$> bs) @{Applicative.Compose}
+  xcsc : (spending1 : List a) -> (cartesian : List b) -> (spending2 : List c) -> List $ (X a b c, Bool)
+  xcsc as bs cs = fromMaybe [] $ evalStateT (as, cs) $ runPerTracked $
+                    itX (pure $ cycleReloaded as cr) (pure <$> bs) (pure $ cycleReloaded cs cr) @{Applicative.Compose}
 
   --- Example run ---
 
   export covering
   mainCyc : IO ()
   mainCyc = for_ [aFewNats, aLotOfNats] $ \nats => do
-    let xs = xcsc nats theStrs
+    let xs = xcsc nats theStrs theChrs
     for_ xs $ putStrLn . ("\n" ++) . show
     putStrLn "\n^^^^^^^^^"
