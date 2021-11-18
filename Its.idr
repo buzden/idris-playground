@@ -1,6 +1,7 @@
 module Its
 
 import Control.Monad.State
+import Control.Monad.Writer
 
 import Data.Maybe
 
@@ -103,3 +104,64 @@ main = for_ [aFewNats, aLotOfNats] $ \nats => do
   let (xs, full) = xsc nats theStrs theChrs
   for_ xs $ putStrLn . ("\n" ++) . show
   putStrLn "\n^^^^^^^^^ cartesian iteration was\{the String $ if full then "" else "n't"} full"
+
+--- Cycling ---
+
+namespace Cycling
+
+  --- Cycling any stateful monad using `Alternative` recovering ---
+
+  covering
+  cycleReloaded : Alternative m => MonadState s m => s -> m a -> m a
+  cycleReloaded s act = act <|> put s *> cycleReloaded s act
+
+  --- Special monad for tracking Alternative's `empty` per value ---
+
+  -- Boolean flag means "all were `empty`"
+  data TrackPer : (Type -> Type) -> Type -> Type where
+    MkTrackPer : StateT Bool m a -> TrackPer m a
+
+  unTrackPer : TrackPer m a -> StateT Bool m a
+  unTrackPer $ MkTrackPer x = x
+
+  Monad m => Functor (TrackPer m) where
+    map f (MkTrackPer m) = MkTrackPer $ f <$> m
+
+  Monad m => Applicative (TrackPer m) where
+    pure = MkTrackPer . pure
+    MkTrackPer f <*> MkTrackPer x = MkTrackPer $ f <*> x
+
+  Alternative m => Monad m => Alternative (TrackPer m) where
+    empty = MkTrackPer empty
+    MkTrackPer l <|> r = MkTrackPer $ l <|> put True *> unTrackPer r
+
+  Monad m => Monad (TrackPer m) where
+    MkTrackPer m >>= f = MkTrackPer $ m >>= unTrackPer . f
+
+--  runTrackPer : Functor m => TrackPer m a -> m (a, Bool)
+--  runTrackPer = map (\(a, b) => (b, a)) . runStateT False . unTrackPer
+
+  --- Running harness ---
+
+  -- failfast like `sequence`, unlike `runCartesianPartial`
+  runPerTracked : Monad m => List (StateT s (TrackPer m) a) -> StateT s m $ List (a, Bool)
+  runPerTracked = evalStateT False . runPerTracked' where
+    runPerTracked' : List (StateT s (TrackPer m) a) -> StateT Bool (StateT s m) $ List (a, Bool)
+    runPerTracked' [] = pure []
+    runPerTracked' (x::xs) = ST $ \tr => ST $ \s => do
+      (tr, s, a)  <- runStateT tr $ unTrackPer $ runStateT s x
+      (map . map . map) ((a, tr)::) $ runStateT s $ runStateT tr $ runPerTracked' xs
+
+  covering
+  xcsc : (spending : List a) -> (cartesian : List b) -> List $ (X a b, Bool)
+  xcsc as bs = fromMaybe [] $ evalStateT as $ runPerTracked $
+                 itX (pure $ cycleReloaded as cr) (pure <$> bs) @{Applicative.Compose}
+
+  --- Example run ---
+
+  export covering
+  mainCyc : IO ()
+  mainCyc = for_ [aFewNats, aLotOfNats] $ \nats => do
+    let xs = xcsc nats theStrs
+    for_ xs $ putStrLn . ("\n" ++) . show
+    putStrLn "\n^^^^^^^^^"
