@@ -1,7 +1,6 @@
 module Its
 
 import Control.Monad.State
-import Control.Monad.Writer
 
 import Data.Maybe
 
@@ -97,7 +96,7 @@ theStrs : List String
 theStrs = ["a", "b", "c"]
 
 theChrs : List Char
-theChrs = chr <$> let k = ord 'a' in [k .. k + 25]
+theChrs = chr <$> let k = ord 'a' in [k .. k + 15]
 
 main : IO ()
 main = for_ [aFewNats, aLotOfNats] $ \nats => do
@@ -111,35 +110,75 @@ namespace Cycling
 
   --- Cycling any stateful monad using `Alternative` recovering ---
 
-  record Cycled where
-    constructor Cyc
-    original : Nat
-    cycled : Nat
+  data Cycled = SomeUncycled | AllCycled
 
-  Semigroup Cycled where
-    Cyc lo lc <+> Cyc ro rc = Cyc (lo + ro) (lc + rc)
-
-  Monoid Cycled where
-    neutral = Cyc 0 0
+  joinUncycled : Cycled -> Cycled -> Cycled
+  joinUncycled SomeUncycled _ = SomeUncycled
+  joinUncycled _ SomeUncycled = SomeUncycled
+  joinUncycled AllCycled AllCycled = AllCycled
 
   Show Cycled where
-    show $ Cyc o c = "or: \{show o}, cyc: \{show c}"
+    show SomeUncycled = "SomeUncycled"
+    show AllCycled = "AllCycled"
+
+  interface Monad m => CycleReporting m where
+    cycleHappened : m ()
 
   covering
-  cycleReloaded : Alternative m => MonadState s m => MonadWriter Cycled m => s -> m a -> m a
-  cycleReloaded s act = doCycle (Cyc 1 0) where
-    doCycle : Cycled -> m a
-    doCycle c = tell c *> act
-            <|> put s *> doCycle (Cyc 0 1)
+  cycleReloaded : Alternative m => MonadState s m => CycleReporting m => s -> m a -> m a
+  cycleReloaded s act = act <|> put s *> cycleHappened *> cycleReloaded s act
+
+  --- Cycling tracking monad ---
+
+  record CycleTrackingStateT s m a where
+    constructor MkCycTr
+    unCycTr : StateT (s, Cycled) m a
+
+  Functor m => Functor (CycleTrackingStateT s m) where
+    map f = MkCycTr . map f . unCycTr
+
+  Monad m => Applicative (CycleTrackingStateT s m) where
+    pure = MkCycTr . pure
+    MkCycTr l <*> MkCycTr r = MkCycTr $ ST \(s, cyc) => do
+      ((s, cycL), l) <- runStateT (s, cyc) l
+      ((s, cycR), r) <- runStateT (s, cyc) r
+      pure ((s, joinUncycled cycL cycR), l r)
+
+  Monad m => Monad (CycleTrackingStateT s m) where
+    MkCycTr l >>= f = MkCycTr $ ST \(s, cyc) => do
+      ((s, cycL), l) <- runStateT (s, cyc) l
+      ((s, cycR), r) <- runStateT (s, cyc) $ unCycTr $ f l
+      pure ((s, joinUncycled cycL cycR), r)
+
+  Monad m => Alternative m => Alternative (CycleTrackingStateT s m) where
+    empty = MkCycTr empty
+    MkCycTr l <|> r = MkCycTr $ l <|> unCycTr r
+
+  Monad m => MonadState s (CycleTrackingStateT s m) where
+    get = MkCycTr get
+    put = MkCycTr . put
+
+  Monad m => CycleReporting (CycleTrackingStateT s m) where
+    cycleHappened = MkCycTr $ modify $ const AllCycled
+
+  Monad m => MonadState l (CycleTrackingStateT (l, r) m) where
+    get = Builtin.fst <$> get
+    put = modify . mapFst . const
+
+  Monad m => MonadState r (CycleTrackingStateT (l, r) m) where
+    get = Builtin.snd <$> get
+    put = modify . mapSnd . const
 
   --- Running harness ---
 
-  runPerTracked : Alternative m => Monad m => List (StateT s (WriterT Cycled m) a) -> StateT s m $ List (a, Cycled)
-  runPerTracked []           = pure []
-  runPerTracked (curr::rest) = ST $ \s => do
-    ((s, l), cycL) <- runWriterT $ map pure <$> runStateT s curr <|> pure (s, [])
-    (s, r) <- runStateT s (runPerTracked rest) <|> pure (s, [])
-    pure (s, map (,cycL) l ++ r)
+  runPerTracked : Alternative m => Monad m => List (CycleTrackingStateT s m a) -> StateT s m $ List (a, Cycled)
+  runPerTracked = doRun SomeUncycled where
+    doRun : Cycled -> List (CycleTrackingStateT s m a) -> StateT s m $ List (a, Cycled)
+    doRun _    []           = pure []
+    doRun cycL (curr::rest) = ST $ \s => do
+      ((s, cycL), l) <- map pure <$> runStateT (s, cycL) (unCycTr curr) <|> pure ((s, cycL), [])
+      (s, r) <- runStateT s (doRun cycL rest) <|> pure (s, [])
+      pure (s, map (,cycL) l ++ r)
 
   covering
   xcsc : (spending1 : List a) -> (cartesian : List b) -> (spending2 : List c) -> List $ (X a b c, Cycled)
