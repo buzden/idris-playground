@@ -145,12 +145,12 @@ namespace Cycling
 
   -- failfast like `sequence`, unlike `runCartesianPartial`
   runPerTracked : Monad m => List (StateT s (TrackPer m) a) -> StateT s m $ List (a, Bool)
-  runPerTracked = evalStateT False . runPerTracked' where
-    runPerTracked' : List (StateT s (TrackPer m) a) -> StateT Bool (StateT s m) $ List (a, Bool)
-    runPerTracked' [] = pure []
-    runPerTracked' (x::xs) = ST $ \tr => ST $ \s => do
-      (tr, s, a)  <- runStateT tr $ unTrackPer $ runStateT s x
-      (map . map . map) ((a, tr)::) $ runStateT s $ runStateT tr $ runPerTracked' xs
+  runPerTracked = runPerTracked' False where
+    runPerTracked' : (trackPerState : Bool) -> List (StateT s (TrackPer m) a) -> StateT s m $ List (a, Bool)
+    runPerTracked' _  []      = pure []
+    runPerTracked' tr (x::xs) = ST $ \s => do
+      (tr, s, a) <- runStateT tr $ unTrackPer $ runStateT s x
+      (map . map) ((a, tr)::) $ runStateT s $ runPerTracked' tr xs
 
   covering
   xcsc : (spending : List a) -> (cartesian : List b) -> List $ (X a b, Bool)
