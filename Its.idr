@@ -87,4 +87,4 @@ main : IO ()
 main = for_ [aFewNats, aLotOfNats] $ \nats => do
   let (xs, full) = xsc nats theStrs
   for_ xs $ putStrLn . ("\n" ++) . show
-  putStrLn "\n^^^^^^^^^ cartesian iteration was\{if full then "" else "n't"} full"
+  putStrLn "\n^^^^^^^^^ cartesian iteration was\{the String $ if full then "" else "n't"} full"
