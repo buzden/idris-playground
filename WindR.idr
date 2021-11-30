@@ -14,7 +14,7 @@ group' : (n : Nat) -> (m : Nat) -> Vect (n * m) a -> Vect m (Vect n a)
 group' n m xs = group m n $ rewrite multCommutative m n in xs
 
 export
-splitAtConcatRev : (n : Nat) -> (xs : Vect (n + m) a) -> {0 l : Vect n a} -> {0 r : Vect m a} -> splitAt n xs = (l, r) -> l ++ r = xs
+splitAtConcatRev : (n : Nat) -> (xs : Vect (n + m) a) -> {0 l : Vect n a} -> {0 r : Vect m a} -> (0 _ : splitAt n xs = (l, r)) -> l ++ r = xs
 splitAtConcatRev Z _ Refl = Refl
 splitAtConcatRev (S n) (x::xs) {l} prf with (splitAt n xs) proof sprf
   splitAtConcatRev (S n) (x::xs) {l=x::l} Refl | (l, r) = cong (x::) $ splitAtConcatRev n xs sprf
