@@ -2,6 +2,8 @@
 
 import Data.Vect
 
+%default total
+
 public export
 group : (n : Nat) -> (m : Nat) -> Vect (n * m) a -> Vect n (Vect m a)
 group Z     _ _  = []
