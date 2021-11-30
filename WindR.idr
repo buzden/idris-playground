@@ -7,6 +7,10 @@ group : (n : Nat) -> (m : Nat) -> Vect (n * m) a -> Vect n (Vect m a)
 group Z     _ _  = []
 group (S n) m xs = let (l, r) = splitAt m xs in l :: group n m r
 
+public export
+group' : (n : Nat) -> (m : Nat) -> Vect (n * m) a -> Vect m (Vect n a)
+group' n m xs = group m n $ rewrite multCommutative m n in xs
+
 export
 splitAtConcatRev : (n : Nat) -> (xs : Vect (n + m) a) -> {0 l : Vect n a} -> {0 r : Vect m a} -> splitAt n xs = (l, r) -> l ++ r = xs
 splitAtConcatRev Z _ Refl = Refl
