@@ -162,3 +162,9 @@ depEx = nonDet [0, 3, 4] >>> lists (nonDet ['a', 'b', 'c'])
 
 mainDep : IO Unit
 mainDep = traverse_ (putStrLn . show) $ vals depEx
+
+depExSp : NonDetS (List a) Unit (List a)
+depExSp = nonDet [0, 3, 4] >>> lists cr
+
+mainDepSp : IO Unit
+mainDepSp = traverse_ (putStrLn . show) $ run' [the Nat 100 .. 300] depExSp
