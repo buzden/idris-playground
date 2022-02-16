@@ -17,7 +17,7 @@ data NonDetS : Type -> Type -> Type -> Type where
   MkNonDetS : (a -> State s $ List b) -> NonDetS s a b
 
 Category (NonDetS s) where
-  MkNonDetS l . MkNonDetS r = MkNonDetS $ r >=> map join . traverse l
+  MkNonDetS l . MkNonDetS r = MkNonDetS $ (>=>) r l @{Compose}
   id = MkNonDetS $ pure @{Compose}
 
 Arrow (NonDetS s) where
