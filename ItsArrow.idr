@@ -35,7 +35,8 @@ Arrow (NonDetS s) where
   first  $ MkNonDetS f = MkNonDetS $ \(x, y) => map @{Compose @{Compose}} (, y) $ f x
   second $ MkNonDetS f = MkNonDetS $ \(x, y) => map @{Compose @{Compose}} (x, ) $ f y
 
---  MkNonDetS f *** MkNonDetS g = MkNonDetS $ \(s, t) => ?foo
+  MkNonDetS f *** MkNonDetS g = MkNonDetS $ \(l, r) => apW (,) (f l) (g r)
+  MkNonDetS f &&& MkNonDetS g = MkNonDetS $ \x => apW (,) (f x) (g x)
 
 ArrowChoice (NonDetS s) where
   left $ MkNonDetS f = MkNonDetS $ \case
