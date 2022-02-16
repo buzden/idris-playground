@@ -14,10 +14,9 @@ import Control.Monad.State
 apW : (a -> b -> c) -> (List $ State s $ List a) -> (List $ State s $ List b) -> List $ State s $ List c
 apW f x y = [| x `ff` y |] where
   ff : State s (List a) -> State s (List b) -> State s $ List c
-  ff aa bb = do
-    aaa <- aa
-    bbb <- bb
-    pure [| f aaa bbb |]
+  ff aa bb = [| aa `fff` bb |] where
+    fff : List a -> List b -> List c
+    fff aaa bbb = [| f aaa bbb |]
 
 -----------------------------------------
 --- Generalised non-determinism arrow ---
