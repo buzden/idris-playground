@@ -11,12 +11,14 @@ import Control.Monad.State
 
 --- Utility ---
 
-apW : (a -> b -> c) -> (List $ State s $ List a) -> (List $ State s $ List b) -> List $ State s $ List c
-apW f x y = [| x `ff` y |] where
-  ff : State s (List a) -> State s (List b) -> State s $ List c
-  ff aa bb = [| aa `fff` bb |] where
-    fff : List a -> List b -> List c
-    fff aaa bbb = [| f aaa bbb |]
+%inline
+apW : Applicative m1 => Applicative m2 => Applicative m3 =>
+      (a -> b -> c) -> (m1 $ m2 $ m3 a) -> (m1 $ m2 $ m3 b) -> m1 $ m2 $ m3 c
+apW f x y = [| f x y |] where
+  %inline pure : forall a. a -> m1 $ m2 $ m3 a
+  pure = Prelude.pure @{Compose @{Compose}}
+  %inline (<*>) : forall a, b. (m1 $ m2 $ m3 $ a -> b) -> (m1 $ m2 $ m3 a) -> m1 $ m2 $ m3 b
+  (<*>) = Prelude.(<*>) @{Compose @{Compose}}
 
 -----------------------------------------
 --- Generalised non-determinism arrow ---
