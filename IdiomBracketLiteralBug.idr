@@ -17,5 +17,11 @@ fromString _      = (+)
 fh' : List Nat -> List Nat -> List Nat
 fh' a b = let x = "haha" in [| x a b |]
 
+fh'' : List Nat -> List Nat -> List Nat
+fh'' a b = [| (let x = "haha" in x) a b |]
+
+fh''' : List Nat -> List Nat -> List Nat
+fh''' a b = [| (let x = () in "haha") a b |]
+
 prop : fh' [4] [5] = [20]
 prop = Refl
