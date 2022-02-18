@@ -129,10 +129,10 @@ Show a => Show b => Show c => Show (X a b c) where
 
 -- Iterator with external static subiterators ---
 
-itY : Arrow ar => ar xx a -> ar xx b -> ar xx c -> ar xx (Y a b c)
+itY : Applicative m => m a -> m b -> m c -> m (Y a b c)
 itY ma mb mc = [| MkY ma mb mc |]
 
-itX : Arrow ar => ar xx a -> ar xx b -> ar xx c -> ar xx (X a b c)
+itX : Applicative m => m a -> m b -> m c -> m (X a b c)
 itX ma mb mc = [| MkX ma ma (itY ma mb [| () |]) (itY ma mb mc) mc |]
 
 -- Running harness --
