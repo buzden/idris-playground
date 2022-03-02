@@ -134,6 +134,10 @@ Show a => Show b => Show c => Show (X a b c) where
 itY : Applicative m => m a -> m b -> m c -> m (Y a b c)
 itY ma mb mc = [| MkY ma mb mc |]
 
+-- If we prefer arrow combinators
+itY' : Arrow ar => ar i a -> ar i b -> ar i c -> ar i (Y a b c)
+itY' ara arb arc = (ara &&& arb &&& arc) >>> arrow (\(x, y, z) => MkY x y z)
+
 itX : Applicative m => m a -> m b -> m c -> m (X a b c)
 itX ma mb mc = [| MkX ma ma (itY ma mb [| () |]) (itY ma mb mc) mc |]
 
