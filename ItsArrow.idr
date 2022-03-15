@@ -20,6 +20,9 @@ apW f x y = [| f x y |] where
   %inline (<*>) : forall a, b. (m1 $ m2 $ m3 $ a -> b) -> (m1 $ m2 $ m3 a) -> m1 $ m2 $ m3 b
   (<*>) = Prelude.(<*>) @{Compose @{Compose}}
 
+printAll : Foldable t => Show a => HasIO io => t a -> io Unit
+printAll = traverse_ $ putStrLn . show
+
 -----------------------------------------
 --- Generalised non-determinism arrow ---
 -----------------------------------------
@@ -102,6 +105,15 @@ extStR $ MkNonDetS f = MkNonDetS $ map (\f' => state $ \(s, t) => mapFst (, t) $
 extStL : NonDetS s a b -> NonDetS (t, s) a b
 extStL $ MkNonDetS f = MkNonDetS $ map (\f' => state $ \(t, s) => mapFst (t, ) $ runState s f') . f
 
+wrapSt : (forall m. MonadState s m => a -> m b) -> NonDetS s a b
+wrapSt f = MkNonDetS $ \x => pure $ f x <&> pure
+
+modif : (a -> s -> s) -> NonDetS s a Unit
+modif f = wrapSt $ modify . f
+
+get : NonDetS s a s
+get = wrapSt $ const get
+
 --- Syntax ---
 
 Arrow ar => Functor (ar ll) where
@@ -178,10 +190,24 @@ depEx : NonDetS Unit Unit (List Char)
 depEx = nonDet [0, 3, 4] >>> lists (nonDet ['a', 'b', 'c'])
 
 mainDep : IO Unit
-mainDep = traverse_ (putStrLn . show) $ vals depEx
+mainDep = printAll $ vals depEx
 
 depExSp : NonDetS (List a) Unit (List a)
 depExSp = nonDet [0, 3, 4] >>> lists cr
 
 mainDepSp : IO Unit
-mainDepSp = traverse_ (putStrLn . show) $ run' [the Nat 100 .. 300] depExSp
+mainDepSp = printAll $ run' [the Nat 100 .. 300] depExSp
+
+--- Dependent generation with remembering ---
+
+rememberGened : NonDetS s a b -> NonDetS (List b, s) a b
+rememberGened super = extStL super >>> (id &&& modif (mapFst . (::))) >>> arrow fst
+
+getFst : NonDetS (s, t) a s
+getFst = get >>> arrow fst
+
+gen1plusRem : NonDetS s inp a -> NonDetS (List a, s) inp (a, List a)
+gen1plusRem genA = rememberGened genA &&& (pure 3 >>> lists (getFst >>> arrow reverse >>> nonDet))
+
+mainDepRem : IO Unit
+mainDepRem = printAll $ vals $ gen1plusRem {s=Unit} $ nonDet ['a', 'b', 'c', 'd']
