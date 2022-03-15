@@ -2,6 +2,8 @@ module ItsArrow
 
 import Data.Either -- due to non-public import in `Control.Arrow`
 
+import Data.SortedSet
+
 import Control.Arrow
 import Control.Category
 
@@ -200,14 +202,14 @@ mainDepSp = printAll $ run' [the Nat 100 .. 300] depExSp
 
 --- Dependent generation with remembering ---
 
-rememberGened : NonDetS s a b -> NonDetS (List b, s) a b
-rememberGened super = extStL super >>> (id &&& modif (mapFst . (::))) >>> arrow fst
+rememberGened : NonDetS s a b -> NonDetS (SortedSet b, s) a b
+rememberGened super = extStL super >>> (id &&& modif (mapFst . insert)) >>> arrow fst
 
 getFst : NonDetS (s, t) a s
 getFst = get >>> arrow fst
 
-gen1plusRem : NonDetS s inp a -> NonDetS (List a, s) inp (a, List a)
-gen1plusRem genA = rememberGened genA &&& (pure 3 >>> lists (getFst >>> arrow reverse >>> nonDet))
+gen1plusRem : NonDetS s inp a -> NonDetS (SortedSet a, s) inp (a, List a)
+gen1plusRem genA = rememberGened genA &&& (pure 3 >>> lists (getFst >>> arrow SortedSet.toList >>> nonDet))
 
 mainDepRem : IO Unit
 mainDepRem = printAll $ vals $ gen1plusRem {s=Unit} $ nonDet ['a', 'b', 'c', 'd']
