@@ -25,6 +25,12 @@ apW f x y = [| f x y |] where
 printAll : Foldable t => Show a => HasIO io => t a -> io Unit
 printAll = traverse_ $ putStrLn . show
 
+infixr 1 >>*>
+
+-- Run the second arrow only for effects, discarding its result
+(>>*>) : Arrow ar => ar a b -> ar b c -> ar a b
+l >>*> r = l >>> (id &&& r) >>> arrow fst
+
 -----------------------------------------
 --- Generalised non-determinism arrow ---
 -----------------------------------------
@@ -203,7 +209,7 @@ mainDepSp = printAll $ run' [the Nat 100 .. 300] depExSp
 --- Dependent generation with remembering ---
 
 rememberGened : NonDetS s a b -> NonDetS (SortedSet b, s) a b
-rememberGened super = extStL super >>> (id &&& modif (mapFst . insert)) >>> arrow fst
+rememberGened super = extStL super >>*> modif (mapFst . insert)
 
 gen1plusRem : NonDetS s inp a -> NonDetS (SortedSet a, s) inp (a, List a)
 gen1plusRem genA = rememberGened genA &&& (pure 3 >>> lists (extStR get >>> arrow SortedSet.toList >>> nonDet))
