@@ -121,6 +121,15 @@ extStR $ MkNonDetS f = MkNonDetS $ map (\f' => state $ \(s, t) => mapFst (, t) $
 extStL : NonDetS s a b -> NonDetS (t, s) a b
 extStL $ MkNonDetS f = MkNonDetS $ map (\f' => state $ \(t, s) => mapFst (t, ) $ runState s f') . f
 
+prefix 9 ^*, *^
+
+%inline
+(^*) : NonDetS s a b -> NonDetS (t, s) a b
+(^*) = extStL
+
+(*^) : NonDetS s a b -> NonDetS (s, t) a b
+(*^) = extStR
+
 --- Monad state wrappers ---
 
 wrapSt : (forall m. MonadState s m => a -> m b) -> NonDetS s a b
@@ -174,7 +183,7 @@ itX ma mb mc = [| MkX ma ma (itY ma mb [| () |]) (itY ma mb mc) mc |]
 -- Running harness --
 
 xsc : (spending1 : List a) -> (cartesian : List b) -> (spending2 : List c) -> List $ X a b c
-xsc spending1 cartesian spending2 = run' (spending1, spending2) $ itX (extStR cr) (nonDet cartesian) (extStL cr)
+xsc spending1 cartesian spending2 = run' (spending1, spending2) $ itX (*^ cr) (nonDet cartesian) (^* cr)
 
 -- Example runs --
 
@@ -219,10 +228,10 @@ mainDepSp = printAll $ run' [the Nat 100 .. 300] depExSp
 --- Dependent generation with remembering ---
 
 rememberGened : NonDetS s a b -> NonDetS (SortedSet b, s) a b
-rememberGened super = extStL super >>*> extStR (modif insert)
+rememberGened super = ^* super >>*> *^ modif insert
 
 gen1plusRem : NonDetS s inp a -> NonDetS (SortedSet a, s) inp (a, List a)
-gen1plusRem genA = rememberGened genA &&& (pure 3 >>> lists (extStR get >>> arrow SortedSet.toList >>> nonDet))
+gen1plusRem genA = rememberGened genA &&& (pure 3 >>> lists (*^ get >>> arrow SortedSet.toList >>> nonDet))
 
 mainDepRem : IO Unit
 mainDepRem = printAll $ vals $ gen1plusRem {s=Unit} $ nonDet ['a', 'b', 'c', 'd']
