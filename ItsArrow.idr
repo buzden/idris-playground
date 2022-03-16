@@ -35,6 +35,8 @@ l >>*> r = l >>> (id &&& r) >>> arrow fst
 --- Generalised non-determinism arrow ---
 -----------------------------------------
 
+--- Datatype and its arrow instances ---
+
 data NonDetS : Type -> Type -> Type -> Type where
   MkNonDetS : (a -> List $ State s $ List b) -> NonDetS s a b
 
@@ -61,6 +63,8 @@ ArrowZero (NonDetS s) where
 ArrowPlus (NonDetS s) where
   MkNonDetS l <++> MkNonDetS r = MkNonDetS $ \x => l x <+> r x
 
+--- Running the `NonDetS` arrow ---
+
 run : s -> NonDetS s a b -> a -> List b
 run s (MkNonDetS f) = join . evalState s . sequence . f
 
@@ -72,6 +76,8 @@ runDef = run neutral
 
 vals : Monoid s => NonDetS s Unit a -> List a
 vals = run' neutral
+
+--- Common particular iterators ---
 
 namespace Static
 
@@ -99,6 +105,8 @@ cr = MkNonDetS $ \() => pure $ do
     | [] => pure []
   put xs $> [x]
 
+--- Wrapping into tupled state ---
+
 joinSts : NonDetS s1 a b1 -> NonDetS s2 a b2 -> NonDetS (s1, s2) a (b1, b2)
 joinSts (MkNonDetS f) (MkNonDetS g) = MkNonDetS $ \x => [| jo (f x) (g x) |] where
   jo : State s1 (List b1) -> State s2 (List b2) -> State (s1, s2) $ List (b1, b2)
@@ -113,6 +121,8 @@ extStR $ MkNonDetS f = MkNonDetS $ map (\f' => state $ \(s, t) => mapFst (, t) $
 extStL : NonDetS s a b -> NonDetS (t, s) a b
 extStL $ MkNonDetS f = MkNonDetS $ map (\f' => state $ \(t, s) => mapFst (t, ) $ runState s f') . f
 
+--- Monad state wrappers ---
+
 wrapSt : (forall m. MonadState s m => a -> m b) -> NonDetS s a b
 wrapSt f = MkNonDetS $ \x => pure $ f x <&> pure
 
@@ -122,7 +132,7 @@ modif f = wrapSt $ modify . f
 get : NonDetS s a s
 get = wrapSt $ const get
 
---- Syntax ---
+--- Applicative syntax ---
 
 Arrow ar => Functor (ar ll) where
   map f x = x >>> arrow f
