@@ -213,3 +213,6 @@ gen1plusRem genA = rememberGened genA &&& (pure 3 >>> lists (getFst >>> arrow So
 
 mainDepRem : IO Unit
 mainDepRem = printAll $ vals $ gen1plusRem {s=Unit} $ nonDet ['a', 'b', 'c', 'd']
+
+mainDepRemSp : IO Unit
+mainDepRemSp = printAll $ run' (empty, theChrs) $ nonDet [0, 1, 2] &&& gen1plusRem cr
