@@ -77,6 +77,25 @@ runDef = run neutral
 vals : Monoid s => NonDetS s Unit a -> List a
 vals = run' neutral
 
+--- Connection between dynamic and static arrows ---
+
+mkDynamic : (a -> NonDetS s Unit b) -> NonDetS s a b
+mkDynamic f = MkNonDetS $ \x => let MkNonDetS g = f x in g ()
+
+mkStatic : NonDetS s a b -> a -> NonDetS s Unit b
+mkStatic (MkNonDetS f) x = MkNonDetS $ const $ f x
+
+-- Identity properties
+
+statDynId : (f : a -> NonDetS s Unit b) -> (x : a) -> mkStatic (mkDynamic f) x === f x
+statDynId ff x with (ff x)
+  _ | MkNonDetS gg with (gg ()) proof prf2
+    _ | ggu = cong MkNonDetS $ rewrite sym prf2 in funext _ _ $ \() => Refl where
+          funext : forall a, b. (f, g : a -> b) -> ((x : a) -> f x = g x) -> f = g
+
+dynStatId : (ar : NonDetS s a b) -> mkDynamic (mkStatic ar) === ar
+dynStatId $ MkNonDetS f = cong MkNonDetS Refl
+
 --- Common particular iterators ---
 
 namespace Static
