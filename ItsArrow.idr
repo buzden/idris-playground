@@ -149,6 +149,12 @@ prefix 9 ^*, *^
 (*^) : NonDetS s a b -> NonDetS (s, t) a b
 (*^) = extStR
 
+elimStR : NonDetS (s, t) a b -> s -> NonDetS t a b
+elimStR (MkNonDetS f) initS = MkNonDetS $ map (\stST => state $ \t => mapFst snd $ runState (initS, t) stST) . f
+
+elimStL : NonDetS (t, s) a b -> s -> NonDetS t a b
+elimStL (MkNonDetS f) initS = MkNonDetS $ map (\stST => state $ \t => mapFst fst $ runState (t, initS) stST) . f
+
 --- Monad state wrappers ---
 
 wrapSt : (forall m. MonadState s m => a -> m b) -> NonDetS s a b
