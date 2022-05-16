@@ -1,6 +1,7 @@
 module Sprintf
 
-%access export
+import Data.String
+
 %default total
 
 public export
@@ -13,5 +14,6 @@ strToSty c ('%'::'c'::ks) = (_ ** \k : Char    => snd $ strToSty (c ++ singleton
 strToSty c ('%':: ks)     = (_ ** \v : Void    => snd $ strToSty c ks)
 strToSty c ( k :: ks)     = strToSty (c ++ singleton k) ks
 
+export
 sprintf : (str : String) -> fst (strToSty "" $ unpack str)
 sprintf str = snd (strToSty "" $ unpack str)

@@ -1,0 +1,5 @@
+package codewars
+
+authors = "Denis Buzdalov"
+
+depends = contrib

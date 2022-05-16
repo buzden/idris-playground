@@ -1,11 +1,13 @@
 module Proof
 
-%default total
-%access export
+import Data.Nat
 
+%default total
+
+export
 invert : (a : Nat) -> (b : Nat) -> (a + a = b + b) -> a = b
 invert Z     Z     = const Refl
-invert Z     (S k) = absurd . SIsNotZ . sym
+invert Z     (S k) = absurd . SIsNotZ . (\x => sym x)
 invert (S k) Z     = absurd . SIsNotZ
 invert (S k) (S j) = rewrite sym $ plusSuccRightSucc k k in rewrite sym $ plusSuccRightSucc j j in
-                     eqSucc k j . invert k j . succInjective (k+k) (j+j) . succInjective (S $ k+k) (S $ j+j)
+                     eqSucc k j . invert k j . injective . injective
