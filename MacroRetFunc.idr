@@ -27,6 +27,28 @@ cool_eq'' : Cool_indirect ~=~ Cool_direct'
 cool_eq'' = Refl
 
 %macro
+coolerMacro : Nat -> Elab (Nat -> Nat -> Nat)
+coolerMacro n = pure (+)
+
+Cooler_indirect : Nat -> Nat
+Cooler_indirect = let z = coolerMacro 4 in z 5
+
+Cooler_direct : Nat -> Nat
+Cooler_direct = coolerMacro 4 5
+
+cooler_eq : Cooler_indirect = Cooler_direct
+cooler_eq = Refl
+
+cooler_eq' : Cooler_indirect ~=~ coolerMacro 4 5
+cooler_eq' = Refl
+
+Cooler_direct' : ?
+Cooler_direct' = coolerMacro 4 5
+
+cooler_eq'' : Cooler_indirect ~=~ Cooler_direct'
+cooler_eq'' = Refl
+
+%macro
 depMacro : (b : Bool) -> if b then Elab (Nat -> Nat) else Nat -> Elab Nat
 depMacro False = \m => pure $ m + 100
 depMacro True  = lambda Nat $ \m => pure $ m + 200
