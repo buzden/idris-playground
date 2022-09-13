@@ -2,8 +2,13 @@
 
 data IsSingleton : Bool -> Type where
   One  : Nat -> IsSingleton True
-  Nil  : IsSingleton False
-  (::) : Nat -> IsSingleton False -> IsSingleton False
+  Many : List Nat -> IsSingleton False
+
+Nil : IsSingleton False
+Nil = Many []
+
+(::) : Nat -> IsSingleton False -> IsSingleton False
+(::) x (Many xs) = Many $ x :: xs
 
 fromInteger : (n : Integer) -> IsSingleton True
 fromInteger = One . fromInteger
