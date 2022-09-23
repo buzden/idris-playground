@@ -1,0 +1,8 @@
+package print-args
+
+authors = "Denis Buzdalov"
+
+depends = contrib
+
+main = PrintArgs
+executable = print-args

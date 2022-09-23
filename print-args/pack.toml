@@ -1,0 +1,4 @@
+[custom.all.print-args]
+type = "local"
+path = "."
+ipkg = "print-args.ipkg"
