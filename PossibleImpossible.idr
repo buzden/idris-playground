@@ -9,6 +9,6 @@ data Odd : Nat -> Type where
   OSS : Odd n -> Odd (2 + n)
 
 notE : (n : Nat) -> Not (Even n, Odd n)
-notE 0         (_, y) = case y of _ impossible
-notE 1         (x, _) = case x of _ impossible
+notE Z         (_, _) impossible
+notE (S Z)     (_, _) impossible
 notE (S $ S n) (ESS n, OSS n) impossible
