@@ -26,5 +26,8 @@ constr_dne = constr_pem {a} . \x, y => x $ \z => pem_to_dne y z
 not_implication : Not (a -> b) -> Not b
 not_implication f x = f $ const x
 
-dne_to_pem : Not $ Not $ (Not (Not a) -> a) -> Either a (Not a)
-dne_to_pem = constr_pem . not_implication
+dne_to_pem' : Not $ Not $ (Not (Not a) -> a) -> Either a (Not a)
+dne_to_pem' = constr_pem . not_implication
+
+dne_to_pem : (forall a. Not (Not a) -> a) -> Either a (Not a)
+dne_to_pem f = f constr_pem
