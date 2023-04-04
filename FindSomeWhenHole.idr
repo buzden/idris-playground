@@ -12,25 +12,25 @@ record Syntax where
     constructor MkSyntax
     ops : List String
 
-record Op (0 syn : Syntax) where
+record Op (nm : String) (0 syn : Syntax) where
     constructor MkOp
     idx : Elem nm syn.ops
 
 name : {syn : Syntax} ->
-       Op syn ->
+       Op nm syn ->
        String
 name (MkOp idx) = get syn.ops idx
 
 %macro
 operation : {syn : Syntax} ->
-            String ->
-            Elab (Op syn)
+            (nm : String) ->
+            Elab (Op nm syn)
 operation nm = do
   IHole _ _ <- quote syn
     | _ => case isElem nm syn.ops of
              Yes idx => pure $ MkOp idx
              No _ => fail "\{show nm} not in \{show syn.ops}"
-  Just so <- search (s : Syntax ** Op s)
+  Just so <- search (s : Syntax ** Op nm s)
     | Nothing => fail "couldn't find appropriate `Syntax` for given operation \{show nm}"
   Just eq <- search (syn === so.fst)
     | Nothing => fail "couldn't match hole and found syn"
@@ -49,5 +49,8 @@ GroupSyntax = MkSyntax ["e", "*", "inv"]
 x : String
 x = name $ operation {syn = GroupSyntax} "*"
 
-y : String
-y = name $ operation "*"
+Y : String
+Y = name $ operation "*"
+
+yCorr : Y = "*"
+yCorr = Refl
