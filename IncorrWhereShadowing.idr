@@ -11,4 +11,3 @@ failing "Mismatch between: n and n"
     inner : (n : Nat) -> (v : Vect n a) -> Unit
     inner n xs with (())
       inner n xs | () = ()
-    inner _ _ = ()
