@@ -10,7 +10,9 @@ de_morgan : Not (Either a b) -> (Not a, Not b)
 de_morgan f = (f . Left, f . Right)
 
 constr_pem : Not $ Not $ Either a (Not a)
-constr_pem = (\(x, y) => y x) . de_morgan
+constr_pem f = f . Right $ f . Left
+--constr_pem = (\(x, y) => y x) . de_morgan
+--constr_pem = uncurry apply . swap . de_morgan
 
 ----
 
