@@ -55,12 +55,21 @@ namespace Gen
   smaller' : Inf (Gen a) -> Gen a
   smaller' = Smaller
 
-  export %macro
-  smaller : a -> Elab b
-  smaller g = do
-    g <- quote g
-    logTerm "debug" 0 "smaller" g
-    check `(smaller' $ delay $ assert_total ~g)
+  export
+  interface SomeGen a g where
+    fromGen : Gen a -> g
+
+  export
+  SomeGen a (Gen a) where
+    fromGen = id
+
+  export
+  SomeGen a (Inf (Gen a)) where
+    fromGen = delay
+
+  export %macro %inline
+  smaller : SomeGen a b => Inf (Gen a) -> Elab b
+  smaller g = pure $ fromGen $ delay $ smaller' $ assert_total g
 
   export
   Functor Gen where
@@ -83,5 +92,19 @@ namespace Gen
 nats : Gen Nat
 nats = frequency' [ (1, pure Z), (Sized id, smaller $ S <$> nats) ]
 
+nats'' : Gen Nat
+nats'' = frequency' [ (1, pure Z), (Sized id, smaller $ S <$> nats) ]
+
 nats' : Gen Nat
 nats' = smaller nats
+
+failing "Can't"
+  na : Nat
+  na = smaller nats
+
+covering
+natsBad : Gen Nat
+natsBad = oneOf [ natsBad ]
+
+natsVeryBad : Gen Nat
+natsVeryBad = smaller natsBad
