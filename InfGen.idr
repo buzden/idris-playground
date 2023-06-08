@@ -16,10 +16,10 @@ namespace Gen
   data Weight = Abs Nat | Sized (Nat -> Nat)
 
   export
-  fromInteger : (n : Integer) -> So (n >= 0) => Weight
+  fromInteger : (n : Integer) -> (0 _ : So $ n >= 0) => Weight
   fromInteger x = Abs $ fromInteger x
 
-  public export
+  export
   data Gen : Type -> Type where
     Pure      : a -> Gen a
     Bind      : Gen a -> (a -> Gen b) -> Gen b
