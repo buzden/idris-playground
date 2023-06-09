@@ -109,6 +109,11 @@ nats = frequency' [ (1, pure Z), (Sized id, smaller $ S <$> nats) ]
 nats'' : Gen Nat
 nats'' = frequency' [ (1, pure Z), (Sized id, smaller $ S <$> nats) ]
 
+nats''' : Gen Nat
+nats''' = impl where
+  impl : Gen Nat
+  impl = frequency' [ (1, pure Z), (Sized id, smaller $ S <$> nats) ]
+
 nats' : Gen Nat
 nats' = smaller nats
 
