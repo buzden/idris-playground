@@ -2,6 +2,7 @@ module InfGen
 
 import Data.Colist
 import Data.List.Lazy
+import Data.Maybe
 import public Data.So
 
 import Language.Reflection
@@ -69,7 +70,20 @@ namespace Gen
 
   export %macro %inline
   smaller : SomeGen a b => Inf (Gen a) -> Elab b
-  smaller g = pure $ fromGen $ delay $ smaller' $ assert_total g
+  smaller g = do
+
+    -- check that `g` typechecks as a separate total function
+    -- commented out because of the compiler's issue https://github.com/idris-lang/Idris2/issues/2993
+--    qg <- quote g -- this will require `public export` on `data Gen` due to too deep quotation
+--    name <- genSym "smcheck"
+--    ty <- fromMaybe `(InfGen.Gen.Gen ?) <$> goal
+--    let claim = IClaim EmptyFC MW Private [Totality Total] $ MkTy EmptyFC EmptyFC name ty
+--    let body = IDef EmptyFC name $ pure $ PatClause EmptyFC (IVar EmptyFC name) qg
+--    let ns = INamespace EmptyFC (MkNS [show !(genSym "Sm"), "SmChecks"]) [claim, body]
+--    declare [ns] <|> failAt (getFC qg) "Can't prove that generator under `smaller` is total"
+
+    -- form the resulting wrapping expression
+    pure $ fromGen $ delay $ smaller' $ assert_total g
 
   export
   Functor Gen where
@@ -83,7 +97,7 @@ namespace Gen
   export
   Applicative Gen where
     pure = Pure
-    nf <*> nb = ?foo
+    nf <*> nb = ?foo_ap
 
   export
   Monad Gen where
@@ -98,7 +112,7 @@ nats'' = frequency' [ (1, pure Z), (Sized id, smaller $ S <$> nats) ]
 nats' : Gen Nat
 nats' = smaller nats
 
-failing "Can't"
+failing "Can't" -- can be also "Mismatch between `Gen Nat` and `Nat`"
   na : Nat
   na = smaller nats
 
