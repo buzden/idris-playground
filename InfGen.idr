@@ -29,6 +29,11 @@ namespace Gen
     ResetSize : Gen a -> Gen a
     Smaller   : Inf (Gen a) -> Gen a
 
+  -- NOTE:
+  -- Separate `Size` constructor is controversal,
+  -- since it's tempting to do, say, `Size >>= \s => frequency [ (1, whatever1), (s, whatever2) ]` which is really ineffective
+  -- and can be done with `frequency [ (1, whatever1), (Sized id, whatever2) ]` in the current design.
+
   export
   oneOf : LazyList (Inf (Gen a)) -> Gen a
   oneOf = OneOf . map (1,)
