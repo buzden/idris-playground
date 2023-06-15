@@ -14,17 +14,17 @@ import Language.Reflection
 namespace Gen
 
   public export
-  data Weight = Abs Nat | Sized (Nat -> Nat)
+  data Weight sz = Abs sz | Sized (Nat -> sz)
 
   export
-  fromInteger : (n : Integer) -> (0 _ : So $ n >= 0) => Weight
+  fromInteger : (n : Integer) -> (0 _ : So $ n >= 0) => Weight Nat
   fromInteger x = Abs $ fromInteger x
 
   export
   data Gen : Type -> Type where
     Pure      : a -> Gen a
     Bind      : Gen a -> (a -> Gen b) -> Gen b
-    OneOf     : LazyList (Weight, Inf (Gen a)) -> Gen a
+    OneOf     : LazyList (Weight Nat, Inf (Gen a)) -> Gen a
     Size      : Gen Nat
     ResetSize : Gen a -> Gen a
     Smaller   : Inf (Gen a) -> Gen a
@@ -43,7 +43,7 @@ namespace Gen
   frequency = OneOf . map (mapFst Abs)
 
   export
-  frequency' : LazyList (Weight, Inf (Gen a)) -> Gen a
+  frequency' : LazyList (Weight Nat, Inf (Gen a)) -> Gen a
   frequency' = OneOf
 
   export
