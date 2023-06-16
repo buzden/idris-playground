@@ -21,6 +21,17 @@ namespace Gen
   fromInteger x = Abs $ fromInteger x
 
   export
+  Semigroup sz => Semigroup (Weight sz) where
+    Abs x   <+> Abs y   = Abs   $ x <+> y
+    Abs x   <+> Sized f = Sized $ (x <+>) . f
+    Sized f <+> Abs y   = Sized $ (<+> y) . f
+    Sized f <+> Sized g = Sized $ \w => f w <+> g w
+
+  export
+  Monoid sz => Monoid (Weight sz) where
+    neutral = Abs neutral
+
+  export
   data Gen : Type -> Type where
     Pure      : a -> Gen a
     Bind      : Gen a -> (a -> Gen b) -> Gen b
