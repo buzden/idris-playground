@@ -143,3 +143,6 @@ natsBad = oneOf [ natsBad ]
 
 natsVeryBad : Gen Nat
 natsVeryBad = smaller natsBad
+
+effectivelyEmpty : Gen Nat
+effectivelyEmpty = smaller effectivelyEmpty
