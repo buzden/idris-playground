@@ -1,0 +1,7 @@
+package functions-in-hedgehog
+version = 0.1.0
+authors = "Denis Buzdalov"
+depends = hedgehog
+main = Main
+executable = "functions-in-hedgehog"
+sourcedir = "src"

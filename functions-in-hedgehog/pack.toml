@@ -1,0 +1,10 @@
+[custom.all.functions-in-hedgehog]
+type = "local"
+path = "."
+ipkg = "functions-in-hedgehog.ipkg"
+
+[custom.all.hedgehog]
+type   = "git"
+url    = "https://github.com/buzden/idris2-hedgehog"
+commit = "702d6ef81c65fa5593d5e3bda4657fc4a4d0ae20"
+ipkg   = "hedgehog.ipkg"
