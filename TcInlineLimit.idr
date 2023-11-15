@@ -5,6 +5,15 @@ addNTimes : Semigroup a => Nat -> (seed : a) -> a -> a
 addNTimes Z     i x = x
 addNTimes (S n) i x = i <+> addNTimes n i x
 
+--%tcinline
+--addNTimes : Semigroup a => Nat -> (seed : a) -> a -> a
+--%tcinline
+--addNTimes' : Semigroup a => Nat -> (seed : a) -> a -> a
+--addNTimes Z     i x = x
+--addNTimes (S n) i x = i <+> addNTimes' n i x
+--addNTimes' Z     i x = x
+--addNTimes' (S n) i x = i <+> addNTimes n i x
+
 data X a = Empty | NonEmpty a (X a)
 
 Semigroup a => Semigroup (X a) where
