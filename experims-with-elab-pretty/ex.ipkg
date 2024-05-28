@@ -1,0 +1,5 @@
+package experiments
+
+builddir = ".build"
+
+depends = elab-util, elab-pretty
