@@ -1,6 +1,4 @@
-data X : Type where
-  [noHints]
-  MkX : X
+data X = MkX
 
 useX : X => Nat
 
