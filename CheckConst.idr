@@ -1,4 +1,4 @@
-%foreign "scheme,chez:(lambda (a b f) (guard (x [#t '()]) (box (f 'check-constantness))))"
+%foreign "scheme,chez:(lambda (a b f) (guard (x [else '()]) (box (f 'check-constantness))))"
          "scheme,racket:(lambda (a b f) (with-handlers ([(lambda (x) #t) (lambda (e) '())]) (box (f 'check-constantness))))"
 checkIfConst : (f : a -> b) -> Maybe b
 
