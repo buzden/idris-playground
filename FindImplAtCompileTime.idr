@@ -11,7 +11,8 @@ scr s = do
     | Nothing => logMsg "find-impl" 0 "`X` for \{s} was not found" $> []
   let arg : List Nat = [1, 2, 3]
 --  xs : List Nat <- check `(f @{the (X ~ !(quote s)) %search} ~ !(quote arg))
-  xs : List Nat <- check `(f @{~ !(quote impl)} ~ !(quote arg))
+--  xs : List Nat <- check `(f @{~ !(quote impl)} ~ !(quote arg))
+  let xs = f @{impl} arg
   logMsg "find-impl" 0 "`X` for \{s} was found"
   --logMsg "find-impl" 0 "the result is: \{show xs}"
   for_ xs $ \x => logMsg "find-impl.item" 0 "item \{show x}"
