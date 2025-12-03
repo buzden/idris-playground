@@ -1,5 +1,7 @@
 module InfGen
 
+import Control.Monad.Random
+
 import Data.Colist
 import Data.List.Lazy
 import Data.Maybe
@@ -30,6 +32,11 @@ namespace Weight
   export
   Monoid sz => Monoid (Weight sz) where
     neutral = Abs neutral
+
+  public export
+  weight : (size : Nat) -> Weight sz -> sz
+  weight _ (Abs x)   = x
+  weight w (Sized f) = f w
 
 namespace Gen
 
@@ -100,16 +107,27 @@ namespace Gen
     (>>=) = Bind
 
   export
-  unGen : Monad m => (any : forall a. (n : LazyList a) -> m $ Maybe a) -> (size : Nat) -> Gen a -> m $ Maybe a
+  unGen : Monad m => (any : forall a. LazyList (Nat, a) -> m $ Maybe a) -> (size : Nat) -> Gen a -> m $ Maybe a
   unGen any initSize = go initSize where
     go : forall a. (size : Nat) -> Gen a -> m $ Maybe a
     go _     $ Pure x      = pure $ pure x
     go size  $ Bind x f    = (go size x >>= go size . f) @{Compose}
-    go size  $ OneOf x     = (any x >>= assert_total go size . snd) @{Compose}
+    go size  $ OneOf x     = (any (map (mapFst $ weight size) x) >>= assert_total go size) @{Compose}
     go size  $ Size        = pure $ pure size
     go Z     $ Smaller x   = pure Nothing
     go (S s) $ Smaller x   = go s x
     go _     $ ResetSize x = assert_total go initSize x -- I don't know why it does not total-check without `assert_total` here
+
+namespace Random
+
+  pickWeighted : Nat -> LazyList (Nat, a) -> Maybe a
+  pickWeighted _ []           = Nothing
+  pickWeighted _ [x]          = Just $ snd x
+  pickWeighted n ((w, x)::xs) = if n < w then Just x else pickWeighted (n `minus` w) xs
+
+  export
+  any : MonadRandom m => LazyList (Nat, a) -> m $ Maybe a
+  any xs = getRandomR (0, sum $ fst <$> xs) <&> \n => pickWeighted n xs
 
 nats : Gen Nat
 nats = frequency' [ (1, pure Z), (Sized id, smaller $ S <$> nats) ]
@@ -132,3 +150,7 @@ failing "looping is not total"
 failing "looping is not total"
   looping : Gen Nat
   looping = oneOf [ resetSize looping ]
+
+export
+main : IO ()
+main = printLn =<< evalRandomIO (unGen any 40 nats)
