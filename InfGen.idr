@@ -321,3 +321,22 @@ failing "looping is not total"
 export
 main : IO ()
 main = printLn =<< for [Z..100] (const $ evalRandomIO $ unGen1 any 40 nats)
+
+------------------------------------------------------------------------------
+
+export %macro
+X3 : Elab Depth
+X3 = check $ IAlternative EmptyFC FirstSuccess $ map (\x => `(Finite ~x)) [ `(Z), `(S Z), `(S $ S Z), `(S $ S $ S Z) ]
+
+data A : Type
+data B : Type
+
+data A = AZ | AS B
+data B = B1 A | B2 A
+
+genA : Gen X3 A
+genB : Gen X3 B
+
+genA = frequency' [ (1, pure AZ), (Sized id, AS <$> smaller genB) ]
+failing "Mismatch between: S (minimum 0 0) and 0"
+  genB = frequency' [ (1, B1 <$> smaller genA), (1, B2 <$> smaller genA) ]
